@@ -1,0 +1,19 @@
+{
+  "name": "a9",
+  "version": "1.0.0",
+  "main": "controller.mjs",
+  "scripts": {
+    "test": "nodemon test",
+    "start": "nodemon controller.mjs"
+  },
+  "keywords": [],
+  "author": "Q. Redwoods",
+  "license": "ISC",
+  "description": "Exercise Tracker by Q. Redwoods REST API",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.7.0",
+    "nodemon": "^3.1.7"
+  }
+}
