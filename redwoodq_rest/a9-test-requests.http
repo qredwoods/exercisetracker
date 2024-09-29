@@ -1,5 +1,5 @@
 @NON_EXISTENT_EXERCISE_ID = 369b336b8c8867f2cc165159
-@DEADLIFT_ID = 66f7e84dff8c189bd07cf961
+@DEADLIFT_ID = 66f91b3d1ba34123f454d843
 
 ### NOTE: Replace the value of the variable DEADLIFT__ID with the value
 ###     of "_id" in the response to the following request, i.e., Request 1.
@@ -169,7 +169,7 @@ GET  http://localhost:3000/exercises/{{NON_EXISTENT_EXERCISE_ID}} HTTP/1.1
 PUT http://localhost:3000/exercises/{{DEADLIFT_ID}} HTTP/1.1
 content-type: application/json
 
-{
+{ 
     "name": "Deadlift",
     "reps": 20,
     "weight": 30,

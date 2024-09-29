@@ -49,7 +49,8 @@ const exerciseSchema = mongoose.Schema({
 // exercise class
 const Exercise = mongoose.model("Exercise", exerciseSchema); 
 
-const createExercise = async (name, reps, weight, unit, date) => { 
+const createExercise = async (body) => { 
+  const {name, reps, weight, unit, date} = body
   // Call the constructor to create an instance of the model class exercise
   const exercise = await new Exercise({name: name, reps: reps, weight: weight, unit: unit, date: date}); 
   // Call save to persist this object as a document in MongoDB 
