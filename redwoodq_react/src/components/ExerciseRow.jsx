@@ -2,7 +2,10 @@ import React from 'react'
 
 const ExerciseRow = () => {
   return (
-    <div>ExerciseRow</div>
+    <tr>
+      <td>Exercise</td>
+      <td>Row</td>
+    </tr>
   )
 }
 
