@@ -3,21 +3,28 @@ import * as model from "./model.mjs";
 import "dotenv/config";
 const app = express();
 
+
 app.use(express.json());
 // connect to MongoDB
 model.connect()
 
 // create new user
 app.post("/exercises", async (req, res) => {
-    const user = await model.createExercise(
-        req.body.name,
-        req.body.reps,
-        req.body.weight,
-        req.body.unit,
-        req.body.date
-    );
-   
-    res.status(201).send(user);
+    allowedFields = ['name','reps','weight', 'unit', 'date'].sort()
+    requestFields = Object.keys(req.body).sort()
+    fieldsMatch = JSON.stringify(allowedFields) === JSON.stringify(requestFields)
+    if (fieldsMatch){
+        const {name, reps, weight, unit, date} = req.body
+        const validName = (typeof(name) === 'string') && (name.length > 0)
+        const validReps = (typeof(reps) === 'int') && (reps > 0)
+        if (name && reps && weight && unit && date){
+            const user = await model.createExercise(
+            name, reps, weight, unit, date
+        );
+       
+        res.status(201).send(user);
+    }
+    
    
 });
 
