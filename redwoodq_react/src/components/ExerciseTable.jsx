@@ -1,7 +1,7 @@
 import React from 'react'
 import ExerciseRow from './ExerciseRow'
 
-const ExerciseTable = ({exercises}) => {
+const ExerciseTable = ({exercises, onDelete, onEdit}) => {
   return (
     <div>
       <table>
@@ -16,7 +16,7 @@ const ExerciseTable = ({exercises}) => {
         </thead>
         <tbody>
         {exercises.map((exercise) => 
-            <ExerciseRow exercise={exercise}/>)}
+            <ExerciseRow exercise={exercise} onDelete={onDelete} onEdit={onEdit}/>)}
         </tbody>
           </table></div>
   )
