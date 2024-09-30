@@ -1,7 +1,7 @@
 import React from 'react'
 import ExerciseRow from './ExerciseRow'
 
-const ExerciseTable = () => {
+const ExerciseTable = ({exercises}) => {
   return (
     <div>ExerciseTable 
       <p>GET data from '/exercises'</p>
@@ -17,10 +17,12 @@ const ExerciseTable = () => {
           </tr>
         </thead>
         <tbody>
-          Dynamically Generate <ExerciseRow/> from API
+        {exercises.map((exercise) => 
+            <ExerciseRow exercise={exercise}/>)}
         </tbody>
           </table></div>
   )
 }
+
 
 export default ExerciseTable
