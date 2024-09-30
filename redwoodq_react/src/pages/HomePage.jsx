@@ -2,8 +2,8 @@ import ExerciseTable from '../components/ExerciseTable'
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function HomePage(setExerciseToEdit) {
-
+function HomePage({setExerciseToEdit}) {
+  const navigate = useNavigate()
   const onDelete = async (_id) => {
     const response = await fetch(`/exercises/${_id}`, { method: 'DELETE' });
     if (response.status === 204) {
@@ -15,7 +15,10 @@ function HomePage(setExerciseToEdit) {
     }
   }
   
-  const onEdit = () => console.log('onEdit was called')
+  const onEdit = (exerciseToEdit) => {console.log('onEdit was called')
+    setExerciseToEdit(exerciseToEdit);
+    navigate('/edit')
+  }
 
   const [exercises, setExercises] = useState([]);
 

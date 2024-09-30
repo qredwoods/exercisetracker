@@ -12,7 +12,7 @@ const ExerciseRow = ({exercise, onDelete, onEdit}) => {
       <td>{weight}</td>
       <td>{unit}</td>
       <td>{date}</td>
-      <td><FiEdit3 onClick={() => onEdit()}/></td>
+      <td><FiEdit3 onClick={() => onEdit(exercise)}/></td>
       <td><TiDeleteOutline onClick={() => onDelete(_id)}/></td>
     </tr>
   )
