@@ -3,9 +3,7 @@ import ExerciseRow from './ExerciseRow'
 
 const ExerciseTable = ({exercises}) => {
   return (
-    <div>ExerciseTable 
-      <p>GET data from '/exercises'</p>
-      <p>put that data in</p>
+    <div>
       <table>
         <thead>
           <tr>
