@@ -15,6 +15,8 @@ function HomePage(setExerciseToEdit) {
     }
   }
   
+  const onEdit = () => console.log('onEdit was called')
+
   const [exercises, setExercises] = useState([]);
 
   const loadExercises = async () => {
@@ -30,7 +32,7 @@ function HomePage(setExerciseToEdit) {
   return (
     <div>
     <h2>Exercises Done</h2>
-        <ExerciseTable exercises={exercises} onDelete={onDelete}/>
+        <ExerciseTable exercises={exercises} onDelete={onDelete} onEdit={onEdit}/>
     </div>
   )
 }

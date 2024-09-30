@@ -2,7 +2,7 @@ import React from 'react'
 import { TiDeleteOutline } from "react-icons/ti";
 import { FiEdit3 } from "react-icons/fi";
 
-const ExerciseRow = ({exercise, onDelete}) => {
+const ExerciseRow = ({exercise, onDelete, onEdit}) => {
   const {name, reps, weight, unit, date, _id} = exercise
 
   return (
@@ -12,7 +12,7 @@ const ExerciseRow = ({exercise, onDelete}) => {
       <td>{weight}</td>
       <td>{unit}</td>
       <td>{date}</td>
-      <td><FiEdit3 onClick={() => console.log('ay ya clicked edit')}/></td>
+      <td><FiEdit3 onClick={() => onEdit()}/></td>
       <td><TiDeleteOutline onClick={() => onDelete(_id)}/></td>
     </tr>
   )
