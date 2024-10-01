@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 const CreateExercisePage = () => {
   
   const [name, setName] = useState('')
-  const [unit, setUnit] = useState('')
+  const [unit, setUnit] = useState('lbs')
   const [reps, setReps] = useState('')
   const [weight, setWeight] = useState('')
   const [date, setDate] = useState('')
@@ -49,8 +49,8 @@ const CreateExercisePage = () => {
       value={unit}
       onChange={e => setUnit(e.target.value)}
       >
-      <option value='lbs'>Lbs</option>type="text"
-      <option value='kgs'>Kgs</option>type="text"
+      <option value='lbs'>Lbs</option>
+      <option value='kgs'>Kgs</option>
       </select>
     <input 
       type="text"

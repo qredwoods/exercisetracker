@@ -6,13 +6,17 @@ body {
   padding: 2em;
   text-align: center;
 }
+table{
+  padding-bottom: 1em;
+}
 
 tr th {
   border: 1px solid salmon;
 }
 
 tr td {
-  border: 2px solid black
+  border: 2px solid darkred;
+  
 }
 
 input {
@@ -21,6 +25,9 @@ input {
 
 button {
   font-family: Georgia, 'Times New Roman', Times, serif;
+  color:rgb(159, 158, 95);
+  background:rgb(13, 57, 180);
+  padding-top: 1em;
 }
 
 #root {
