@@ -15,8 +15,8 @@ const ExerciseTable = ({exercises, onDelete, onEdit}) => {
           </tr>
         </thead>
         <tbody>
-        {exercises.map((exercise) => 
-            <ExerciseRow exercise={exercise} onDelete={onDelete} onEdit={onEdit}/>)}
+        {exercises.map((exercise, index) => 
+            <ExerciseRow exercise={exercise} key={index*3} onDelete={onDelete} onEdit={onEdit}/>)}
         </tbody>
           </table></div>
   )

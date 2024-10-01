@@ -15,7 +15,7 @@ function HomePage({setExerciseToEdit}) {
     }
   }
   
-  const onEdit = (exerciseToEdit) => {console.log('onEdit was called')
+  const onEdit = (exerciseToEdit) => {
     setExerciseToEdit(exerciseToEdit);
     navigate('/edit')
   }
@@ -36,6 +36,7 @@ function HomePage({setExerciseToEdit}) {
     <div>
     <h2>Exercises Done</h2>
         <ExerciseTable exercises={exercises} onDelete={onDelete} onEdit={onEdit}/>
+        <button onClick={() => navigate('/create')}>New Entry</button>
     </div>
   )
 }
