@@ -18,39 +18,36 @@ MERN app: a React frontend and REST API Express + Mongoose / MongoDB backend.
 ## Run
 There is a react folder for the Frontend, and rest folder for the REST API. The REST API backend can run independently. So can the frontend, but it will lack any CRUD functionality, only showing starter UI and buttons.
 ### Frontend
-From the redwoodq_react folder
+From the frontend folder
 ```
 npm i
 npm run dev
 ```
 The app will be viewable locally on port 5173, the Vite standard, or if busy, another in your terminal.
 
-### Backend (requires .env file) - Needs some care to
-Create a `.env` file in the redwoodq_rest folder:
-It needs two values, a port ("3000" is a fine default) and a [MongoDB connection string](https://www.mongodb.com/resources/products/fundamentals/mongodb-connection-string). You will need a MongoDB account (free is sufficient) to get one.
+### Backend
 
-In the environment file the variables should be formatted as follows.
+This project requires a [MongoDB connection string](https://www.mongodb.com/resources/products/fundamentals/mongodb-connection-string). You will need a MongoDB account (free is sufficient) to get one.
+
+
+Create a `.env` file in the backend folder.
+
 ```
-PORT = "<your preferred port here>"  
-MONGODB_URI = "<your connection string>"
+PORT = <your preferred port here, e.g. 3000>  
+MONGODB_URI = <your connection string>
 ```
 
-Once you have a .env file in the redwoodq_react folder, from the same folder in terminal enter:
+With .env in place, from the same folder, in terminal enter:
 ```
 npm i
 npm start
 ```
-This will use the nodemon package for hot reloads. 
 
-If you do not connect successfully to MongoDB, you will see
-
-```
-Error: Could not connect to MongoDB
-```
+The app will state whether the MongoDB connection was successful or not.
 
 Once both terminal windows are up and running, you can add, edit, read, and delete exercises. 
 
-These changes will persist in your database until you restart the application. There is an optional drop table parameter in the model, but it is not currently used.
+These changes will persist in your database. 
 
-You can also use the `a9-test-requests.http` file to send requests (many IDEs can send http requests with relevant extensions) using only the backend.
+You can also use the `test-requests.http` file to send requests (many IDEs can send http requests with relevant extensions) using only the backend.
 
