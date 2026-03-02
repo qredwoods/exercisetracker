@@ -12,19 +12,25 @@ const CreateExercisePage = () => {
 
   const navigate = useNavigate()
   const addExercise = async () => {
-    const newExercise = { name, reps, weight, unit, date };
-    const response = await fetch('/api/exercises', {
-      method: 'POST',
-      body: JSON.stringify(newExercise),
-      headers: { 'Content-Type': 'application/json'}
-    });
-    if(response.status === 201){
-      alert("Successfully added the exercise!");
-    } else {
-      alert(`Failed to add exercise, status code = ${response.status}`);
-    }
-    navigate("/");
-  };
+  const newExercise = { name, reps, weight, unit, date };
+
+  const response = await fetch("/api/exercises", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newExercise),
+  });
+
+  // Try to parse JSON safely (may be empty in some cases)
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    alert(data?.error || `Request failed: ${response.status}`);
+    return;
+  }
+
+  alert("Successfully added the exercise!");
+  navigate("/");
+};
 
   return (
     <div>

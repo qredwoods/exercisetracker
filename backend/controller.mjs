@@ -13,8 +13,19 @@ app.use(cors({
 }));
 
 app.use(express.json());
-// connect to MongoDB
-model.connect()
+
+const isReadOnly =
+  process.env.NODE_ENV === "production" && process.env.DEMO_READ_ONLY === "true";
+
+app.use((req, res, next) => {
+  // Allow safe methods
+  if (!isReadOnly) return next();
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return next();
+
+  return res.status(403).json({
+    error: "Demo is read-only. Run locally for full access.",
+  });
+});
 
 function isDateValid(date) {
     const format = /^\d\d-\d\d-\d\d$/;

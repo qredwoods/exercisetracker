@@ -5,15 +5,21 @@ import { useNavigate } from 'react-router-dom';
 function HomePage({setExerciseToEdit}) {
   const navigate = useNavigate()
   const onDelete = async (_id) => {
-    const response = await fetch(`/api/exercises/${_id}`, { method: 'DELETE' });
-    if (response.status === 204) {
-      const getResponse = await fetch('/api/exercises');
-      const exercises = await getResponse.json();
-      setExercises(exercises);
-    } else {
-      console.error(`Failed to delete exercise with id = ${_id}, status code = ${response.status}`)
-    }
+  const response = await fetch(`/api/exercises/${_id}`, { method: "DELETE" });
+
+  if (response.status === 204) {
+    const getResponse = await fetch("/api/exercises");
+    const exercises = await getResponse.json();
+    setExercises(exercises);
+    return;
   }
+
+  const data = await response.json().catch(() => null);
+  const message =
+    data?.error || `Failed to delete exercise (${response.status})`;
+
+  alert(message);
+};
   
   const onEdit = (exerciseToEdit) => {
     setExerciseToEdit(exerciseToEdit);

@@ -20,13 +20,23 @@ const EditExercisePage = ({exerciseToEdit}) => {
       body: JSON.stringify(editedExercise),
       headers: { 'Content-Type': 'application/json'}
     });
-    if(response.status === 200){
-      alert("Successfully updated the exercise!");
-    } else {
-      alert(`Failed to update exercise, status code: ${response.status}`);
+    if (response.status === 201) {
+  alert("Successfully update the exercise!");
+} else {
+  let errorMessage = `Failed to update the exercise, status code = ${response.status}`;
+
+  try {
+    const data = await response.json();
+    if (data.error) {
+      errorMessage = data.error;
     }
-    navigate("/");
+  } catch {
+    // ignore JSON parse errors (e.g. empty response)
   }
+
+  alert(errorMessage);
+}
+  };
 
   return (
     <div>
