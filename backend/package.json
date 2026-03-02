@@ -1,5 +1,5 @@
 {
-  "name": "a9",
+  "name": "exercise-tracker-api",
   "version": "1.0.0",
   "main": "controller.mjs",
   "scripts": {
