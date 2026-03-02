@@ -24,7 +24,7 @@ function isBodyValid(body) {
         const validName = (typeof(name) === 'string') && (name.length > 0)
         const vReps = (typeof(reps) === 'number') && (reps > 0)
         const vWeight = (typeof(weight) === 'number') && (weight > 0)
-        const vUnit = unit === 'kgs' | unit === 'lbs';
+        const vUnit = unit === 'kgs' || unit === 'lbs';
         
         const validationResult = validName && vReps && vWeight && vUnit && isDateValid(date)
         return validationResult
@@ -81,6 +81,9 @@ app.delete("/exercises/:_id", async (req, res) => {
     else res.sendStatus(204)
 });
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server listening on port ${process.env.PORT}...`);
-});
+const PORT = process.env.PORT || 5000;
+
+(async () => {
+  await model.connect();
+  app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`));
+})();
