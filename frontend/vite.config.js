@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/exercises': {
+      '/api': {
         target: 'http://localhost:3000'
       }
     }

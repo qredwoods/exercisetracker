@@ -1,8 +1,16 @@
 import express from "express";
 import * as model from "./model.mjs";
 import "dotenv/config";
+import cors from "cors"
+
 const app = express();
 
+const ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";
+
+app.use(cors({
+  origin: ORIGIN,
+  credentials: true
+}));
 
 app.use(express.json());
 // connect to MongoDB
@@ -31,7 +39,7 @@ function isBodyValid(body) {
         
 }}
 // create new exercise
-app.post("/exercises", async (req, res) => {
+app.post("/api/exercises", async (req, res) => {
     const body = req.body   
     if (isBodyValid(body)) {
             const exercise = await model.createExercise(body);
@@ -41,13 +49,13 @@ app.post("/exercises", async (req, res) => {
 });
 
 // get exercises
-app.get("/exercises", async (req, res) => {
+app.get("/api/exercises", async (req, res) => {
    const results = await model.findExercises(req.query)
    res.status(200).send(results)
 });
 
 
-app.get("/exercises/:_id", async (req, res) => {
+app.get("/api/exercises/:_id", async (req, res) => {
     const result = await model.findExerciseById(req.params._id);
     if (result === null) {
         res.status(404).send({"Error": "Not found"})
@@ -56,7 +64,7 @@ app.get("/exercises/:_id", async (req, res) => {
 });
 
 // update
-app.put("/exercises/:_id", async (req, res) => {
+app.put("/api/exercises/:_id", async (req, res) => {
     const body = req.body
     if (isBodyValid(body)) {
     const result = await model.updateExercise(req.params._id, body)
@@ -68,12 +76,12 @@ app.put("/exercises/:_id", async (req, res) => {
 })
 
 // delete
-app.delete("/exercises", async (req, res) => {
+app.delete("/api/exercises", async (req, res) => {
     const result = await model.deleteExercises(req.query)
     res.status(200).send({deletedCount: result.deletedCount})
 });
 
-app.delete("/exercises/:_id", async (req, res) => {
+app.delete("/api/exercises/:_id", async (req, res) => {
     const result = await model.deleteById(req.params._id)
     if (result === 0) { 
         res.status(404).send({"Error": "Not found"})

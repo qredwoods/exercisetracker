@@ -32,7 +32,7 @@ async function connect(dropCollection){
  * @returns A connection to the server
  */
 async function createConnection(){
-    await mongoose.connect(process.env.MONGODB_CONNECT_STRING, 
+    await mongoose.connect(process.env.MONGODB_URI, 
                 {dbName: EXERCISE_DB_NAME});
     return mongoose.connection;
 }

@@ -15,7 +15,7 @@ const EditExercisePage = ({exerciseToEdit}) => {
   const navigate = useNavigate()
   const updateExercise = async (_id) => {
     const editedExercise = { name, reps, weight, unit, date };
-    const response = await fetch(`/exercises/${_id}`, {
+    const response = await fetch(`/api/exercises/${_id}`, {
       method: 'PUT',
       body: JSON.stringify(editedExercise),
       headers: { 'Content-Type': 'application/json'}

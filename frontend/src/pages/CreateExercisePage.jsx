@@ -13,7 +13,7 @@ const CreateExercisePage = () => {
   const navigate = useNavigate()
   const addExercise = async () => {
     const newExercise = { name, reps, weight, unit, date };
-    const response = await fetch('/exercises', {
+    const response = await fetch('/api/exercises', {
       method: 'POST',
       body: JSON.stringify(newExercise),
       headers: { 'Content-Type': 'application/json'}

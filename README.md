@@ -34,7 +34,7 @@ It needs two values, a port ("3000" is a fine default) and a [MongoDB connection
 In the environment file the variables should be formatted as follows.
 ```
 PORT = "<your preferred port here>"  
-MONGODB_CONNECT_STRING = "<your connection string>"
+MONGODB_URI = "<your connection string>"
 ```
 
 Once you have a .env file in the redwoodq_react folder, from the same folder in terminal enter:

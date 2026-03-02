@@ -24,7 +24,7 @@ function App() {
           <Route path="/edit" element={<EditExercisePage exerciseToEdit={exerciseToEdit}/>}/> 
         </Routes>
       </Router>
-      <footer>©2024 Quinn Redwoods</footer>
+      <footer>©2026 Quinn Redwoods</footer>
     </>
   )
 }

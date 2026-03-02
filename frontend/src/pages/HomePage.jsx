@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 function HomePage({setExerciseToEdit}) {
   const navigate = useNavigate()
   const onDelete = async (_id) => {
-    const response = await fetch(`/exercises/${_id}`, { method: 'DELETE' });
+    const response = await fetch(`/api/exercises/${_id}`, { method: 'DELETE' });
     if (response.status === 204) {
-      const getResponse = await fetch('/exercises');
+      const getResponse = await fetch('/api/exercises');
       const exercises = await getResponse.json();
       setExercises(exercises);
     } else {
@@ -23,7 +23,7 @@ function HomePage({setExerciseToEdit}) {
   const [exercises, setExercises] = useState([]);
 
   const loadExercises = async () => {
-    const response = await fetch('/exercises');
+    const response = await fetch('/api/exercises');
     const exercises = await response.json();
     setExercises(exercises);
   }
