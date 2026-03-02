@@ -38,6 +38,12 @@ function isBodyValid(body) {
         return validationResult
         
 }}
+
+// health check
+app.get("/health", (_, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 // create new exercise
 app.post("/api/exercises", async (req, res) => {
     const body = req.body   
