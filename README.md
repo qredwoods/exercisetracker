@@ -1,9 +1,7 @@
 # Exercise Tracker
-Add, edit, review and delete exercise logs.
+Create, edit, review and delete exercise logs.
 
-Simple MERN app that with a React front end and REST API Express + Mongoose back end.
-
-This was a final course assignment from my first web dev course. 
+MERN app: a React frontend and REST API Express + Mongoose / MongoDB backend.
 
 ## Screenshots
 
