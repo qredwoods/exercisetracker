@@ -1,6 +1,6 @@
-import React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { apiFetch } from '../api'
 
 const EditExercisePage = ({exerciseToEdit}) => {
 
@@ -11,32 +11,22 @@ const EditExercisePage = ({exerciseToEdit}) => {
   const [date, setDate] = useState(exerciseToEdit.date)
 
   const _id = exerciseToEdit._id
-
   const navigate = useNavigate()
+
   const updateExercise = async (_id) => {
     const editedExercise = { name, reps, weight, unit, date };
-    const response = await fetch(`/api/exercises/${_id}`, {
+
+    try { await apiFetch(`/api/exercises/${_id}`, {
       method: 'PUT',
       body: JSON.stringify(editedExercise),
-      headers: { 'Content-Type': 'application/json'}
     });
-    if (response.status === 201) {
-  alert("Successfully update the exercise!");
-} else {
-  let errorMessage = `Failed to update the exercise, status code = ${response.status}`;
 
-  try {
-    const data = await response.json();
-    if (data.error) {
-      errorMessage = data.error;
-    }
-  } catch {
-    // ignore JSON parse errors (e.g. empty response)
+    alert("Successfully updated the exercise!");
+    navigate("/")
+  } catch (err) {
+    alert(err.message)
   }
-
-  alert(errorMessage);
-}
-  };
+};
 
   return (
     <div>
@@ -61,8 +51,8 @@ const EditExercisePage = ({exerciseToEdit}) => {
       value={unit}
       onChange={e => setUnit(e.target.value)}
       >
-      <option value='kgs'>Kgs</option>type="text"
-      <option value='lbs'>Lbs</option>type="text"
+      <option value='kgs'>Kgs</option>
+      <option value='lbs'>Lbs</option>
       
       </select>
     <input 
