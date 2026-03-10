@@ -167,12 +167,10 @@ The interface attempts to support accessible interaction patterns:
 ## Progressive UI Iteration
 The UI evolved significantly during development. Early versions focused on functionality, while later iterations improved:
 
-- visual hierarchy
+- visual hierarchy and appeal
 - table layout consistency
-- action affordances
+- clear action buttons
 - responsive form design
-
-Screenshots in this README show that progression.
 
 ---
 
