@@ -17,7 +17,7 @@ content-type: application/json
     "reps": 12,
     "weight": 30,
     "unit": "kgs",
-    "date": "07-18-24"
+    "date": "2026-02-18"
 }
 
 
@@ -33,7 +33,7 @@ content-type: application/json
     "reps": 13,
     "weight": 31,
     "unit": "lbs",
-    "date": "07-18-24"
+    "date": "2026-02-18"
 }
 
 ### Request 3: Create another exercise
@@ -48,7 +48,7 @@ content-type: application/json
     "reps": 14,
     "weight": 32,
     "unit": "kgs",
-    "date": "07-25-24"
+    "date": "2026-02-24"
 }
 
 ### Request 4: Create an exercise
@@ -63,7 +63,7 @@ content-type: application/json
     "reps": 15,
     "weight": 33,
     "unit": "lbs",
-    "date": "07-25-24"
+    "date": "2026-02-24"
 }
 
 ### Request 5: Invalid request for exercise creation
@@ -77,7 +77,7 @@ content-type: application/json
     "name": "Deadlift",
     "reps": 12,
     "weight": 25,
-    "date": "07-18-24"
+    "date": "2026-02-24"
 }
 
 ### Request 6: Invalid request for exercise creation
@@ -106,7 +106,7 @@ content-type: application/json
     "reps": 12,
     "weight": 0,
     "unit": "kgs",
-    "date": "07-18-24"
+    "date": "2026-02-24"
 }
 
 ### Request 8: Invalid request for exercise creation
@@ -121,7 +121,7 @@ content-type: application/json
     "reps": "not a number",
     "weight": 1,
     "unit": "kgs",
-    "date": "07-18-24"
+    "date": "2026-02-24"
 }
 
 
@@ -137,7 +137,7 @@ content-type: application/json
     "reps": 18,
     "weight": 1,
     "unit": "kgs",
-    "date": "aa-18-24"
+    "date": "2026-aa-24"
 }
 
 ### Request 10: Retrieve all
@@ -174,7 +174,7 @@ content-type: application/json
     "reps": 20,
     "weight": 30,
     "unit": "lbs",
-    "date": "07-18-24"
+    "date": "2026-02-24"
 }
 
 ### Request 14: Verify that the previous update set reps to 20 and unit
@@ -212,7 +212,7 @@ content-type: application/json
     "reps": "not a number",
     "weight": 1,
     "unit": "kgs",
-    "date": "07-18-24"
+    "date": "2026-02-18"
 }
 
 
@@ -243,7 +243,7 @@ content-type: application/json
     "reps": 12,
     "weight": 30,
     "unit": "lbs",
-    "date": "06-25-24"
+    "date": "2026-02-24"
 }
 
 
@@ -271,5 +271,5 @@ DELETE http://localhost:3000/exercises/{{NON_EXISTENT_EXERCISE_ID}} HTTP/1.1
 ### Response
 ### Status Code: 200
 ### Body: Array must contain 3 exercises and must not contain the Deadlift for
-###     07-18-24
+###     2026-02-24
 GET http://localhost:3000/exercises HTTP/1.1

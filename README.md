@@ -30,12 +30,7 @@ The app will be viewable locally on port 5173, the Vite standard, or if busy, an
 This project requires a [MongoDB connection string](https://www.mongodb.com/resources/products/fundamentals/mongodb-connection-string). You will need a MongoDB account (free is sufficient) to get one.
 
 
-Create a `.env` file in the backend folder.
-
-```
-PORT = <your preferred port here, e.g. 3000>  
-MONGODB_URI = <your connection string>
-```
+Copy the `.env.example` file and save as `.env` and populate the values.
 
 With .env in place, from the same folder, in terminal enter:
 ```
