@@ -28,8 +28,7 @@ app.use((req, res, next) => {
 });
 
 function isDateValid(date) {
-    const format = /^\d\d-\d\d-\d\d$/;
-    return format.test(date);
+  return /^\d{4}-\d{2}-\d{2}$/.test(date);
 }
 
 function isBodyValid(body) {

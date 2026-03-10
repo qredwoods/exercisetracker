@@ -23,12 +23,13 @@ h1 {
     0 2px 4px #00000055;
 }
 
-tr th {
+tr th, td {
   border: 1px solid salmon;
+  padding: .4em;
 }
 
 tr td {
-  border: 2px solid darkred;
+  border: 1px solid rgb(186, 78, 66);
   
 }
 
