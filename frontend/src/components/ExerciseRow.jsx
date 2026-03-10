@@ -24,7 +24,7 @@ const ExerciseRow = ({exercise, onDelete, onEdit}) => {
     <tr>
       <td>{name}</td>
       <td>{reps}</td>
-      <td><td>{unit === "bodyweight" ? "-" : weight}</td>
+      <td>{unit === "bodyweight" ? "-" : weight}</td>
       <td>{unit}</td>
       <td>{formatDisplayDate(date)}</td>
       <td><FiEdit3 onClick={() => onEdit(exercise)}/></td>
