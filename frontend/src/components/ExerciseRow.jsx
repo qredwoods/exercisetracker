@@ -1,5 +1,5 @@
 import { TiDeleteOutline } from "react-icons/ti";
-import { FiEdit3 } from "react-icons/fi";
+import { FiEdit3, FiCopy } from "react-icons/fi";
 
 function formatDisplayDate(dateString) {
   const [year, month, day] = dateString.split("-");
@@ -17,20 +17,52 @@ function formatDisplayDate(dateString) {
   });
 }
 
-const ExerciseRow = ({exercise, onDelete, onEdit}) => {
-  const {name, reps, weight, unit, date, _id} = exercise
+const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate }) => {
+  const { name, reps, weight, unit, date, _id } = exercise;
+  const isBodyweight = unit === "bodyweight";
 
   return (
     <tr>
       <td>{name}</td>
       <td>{reps}</td>
-      <td>{unit === "bodyweight" ? "BW" : weight}</td>
-      <td>{unit}</td>
+      <td>{isBodyweight ? "BW" : weight}</td>
+      <td>{isBodyweight ? "—" : unit}</td>
       <td>{formatDisplayDate(date)}</td>
-      <td><FiEdit3 onClick={() => onEdit(exercise)}/></td>
-      <td><TiDeleteOutline onClick={() => onDelete(_id)}/></td>
-    </tr>
-  )
-}
 
-export default ExerciseRow
+      <td>
+        <button
+          type="button"
+          className="icon-button"
+          aria-label={`Edit ${name}`}
+          onClick={() => onEdit(exercise)}
+        >
+          <FiEdit3 />
+        </button>
+      </td>
+
+      <td>
+        <button
+          type="button"
+          className="icon-button"
+          aria-label={`Duplicate ${name}`}
+          onClick={() => onDuplicate(exercise)}
+        >
+          <FiCopy />
+        </button>
+      </td>
+
+      <td>
+        <button
+          type="button"
+          className="icon-button"
+          aria-label={`Delete ${name}`}
+          onClick={() => onDelete(_id)}
+        >
+          <TiDeleteOutline />
+        </button>
+      </td>
+    </tr>
+  );
+};
+
+export default ExerciseRow;

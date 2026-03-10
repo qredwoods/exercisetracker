@@ -1,6 +1,6 @@
 import ExerciseRow from './ExerciseRow'
 
-const ExerciseTable = ({exercises, onDelete, onEdit}) => {
+const ExerciseTable = ({exercises, onDelete, onEdit, onDuplicate}) => {
   return (
     <div>
       <table>
@@ -11,11 +11,12 @@ const ExerciseTable = ({exercises, onDelete, onEdit}) => {
             <th>Weight</th>
             <th>Unit</th>
             <th>Date</th>
+            <th colSpan={3}>Actions</th>
           </tr>
         </thead>
         <tbody>
         {exercises.map((exercise, index) => 
-            <ExerciseRow exercise={exercise} key={index*3} onDelete={onDelete} onEdit={onEdit}/>)}
+            <ExerciseRow exercise={exercise} key={index*3} onDelete={onDelete} onEdit={onEdit} onDuplicate={onDuplicate}/>)}
         </tbody>
           </table></div>
   )

@@ -11,8 +11,7 @@ function todayIsoLocal() {
 const today = todayIsoLocal();
 
 const ExerciseForm = ({
-  title,
-  buttonLabel,
+  formId = "exercise-form",
   initialExercise = {},
   onSubmit,
 }) => {
@@ -22,6 +21,8 @@ const ExerciseForm = ({
   const [unit, setUnit] = useState(initialExercise.unit || "lbs");
   const [date, setDate] = useState(initialExercise.date || today);
   const [formError, setFormError] = useState("");
+
+  const isBodyweight = unit === "bodyweight";
 
   const validateForm = () => {
     if (!name.trim() || reps === "" || !unit || !date) {
@@ -42,10 +43,9 @@ const ExerciseForm = ({
       }
     }
 
-
-  if (date > today) {
-    return "Date cannot be in the future.";
-  }
+    if (date > today) {
+      return "Date cannot be in the future.";
+    }
 
     return "";
   };
@@ -63,7 +63,7 @@ const ExerciseForm = ({
     const payload = {
       name: name.trim(),
       reps: Number(reps),
-      weight: unit === "bodyweight" ? 0 : Number(weight),
+      weight: isBodyweight ? 0 : Number(weight),
       unit,
       date,
     };
@@ -71,15 +71,16 @@ const ExerciseForm = ({
     await onSubmit(payload);
   };
 
-  const isBodyweight = unit === "bodyweight";
-
   return (
     <div>
-      <h2>{title}</h2>
 
-      {formError && <p className="form-error">{formError}</p>}
+
+      <p className="form-error" aria-live="polite">
+        {formError}
+      </p>
 
       <form
+        id={formId}
         className="exercise-form"
         onSubmit={(e) => {
           e.preventDefault();
@@ -87,9 +88,9 @@ const ExerciseForm = ({
         }}
       >
         <div className="form-field name-field">
-          <label htmlFor="name">Exercise</label>
+          <label htmlFor={`${formId}-name`}>Exercise</label>
           <input
-            id="name"
+            id={`${formId}-name`}
             type="text"
             placeholder="Exercise name"
             value={name}
@@ -99,9 +100,9 @@ const ExerciseForm = ({
         </div>
 
         <div className="form-field reps-field">
-          <label htmlFor="reps">Reps</label>
+          <label htmlFor={`${formId}-reps`}>Reps</label>
           <input
-            id="reps"
+            id={`${formId}-reps`}
             type="number"
             min="1"
             placeholder="Reps"
@@ -114,9 +115,9 @@ const ExerciseForm = ({
         </div>
 
         <div className="form-field weight-field">
-        <label htmlFor="weight">Weight</label>
+          <label htmlFor={`${formId}-weight`}>Weight</label>
           <input
-            id="weight"
+            id={`${formId}-weight`}
             type="number"
             min="0"
             placeholder={isBodyweight ? "Bodyweight only" : "Weight"}
@@ -126,13 +127,15 @@ const ExerciseForm = ({
             }
             disabled={isBodyweight}
             className={isBodyweight ? "is-disabled" : ""}
-            />
+            aria-invalid={!!formError && !isBodyweight && weight === ""}
+          />
+          
         </div>
 
         <div className="form-field unit-field">
-          <label htmlFor="unit">Unit</label>
+          <label htmlFor={`${formId}-unit`}>Unit</label>
           <select
-            id="unit"
+            id={`${formId}-unit`}
             value={unit}
             onChange={(e) => {
               const nextUnit = e.target.value;
@@ -150,24 +153,15 @@ const ExerciseForm = ({
         </div>
 
         <div className="form-field date-field">
-          <label htmlFor="date">Date</label>
+          <label htmlFor={`${formId}-date`}>Date</label>
           <input
-            id="date"
+            id={`${formId}-date`}
             type="date"
             max={today}
             value={date}
             onChange={(e) => setDate(e.target.value)}
             aria-invalid={!!formError && !date}
           />
-        </div>
-
-        <div className="form-field submit-field">
-          <label className="visually-hidden" htmlFor="submit-button">
-            Submit
-          </label>
-          <button id="submit-button" type="submit">
-            {buttonLabel}
-          </button>
         </div>
       </form>
     </div>

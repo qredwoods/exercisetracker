@@ -12,37 +12,183 @@ body {
   padding: 2em;
   text-align: center;
 }
-table{
-  padding-bottom: 1em;
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
 }
 
 h1 {
-    text-shadow:
+  font-size: 3.2em;
+  line-height: 1.1;
+  color: inherit;
+}
+
+a {
+  font-weight: 500;
+  color: #da9be8;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #c64d98;
+}
+
+footer {
+  color: #747bff;
+}
+
+.cta-button {
+  min-height: 52px;
+  padding: 0.6em 1.2em;
+  border-radius: 8px;
+  border: 1px solid rgba(163, 230, 53, 0.22);
+  font-size: 1em;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  background: linear-gradient(
+    135deg,
+    rgba(14, 35, 118, 0.96),
+    rgba(2, 6, 23, 0.98)
+  );
+  color: #b7e4a8;
+  cursor: pointer;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease,
+    color 0.22s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(163, 230, 53, 0.42);
+  color: #d9f99d;
+  background:
+    linear-gradient(135deg, salmon, rgb(18, 18, 162));
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(163, 230, 53, 0.08),
+    0 0 18px rgba(163, 230, 53, 0.12);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+button:focus-visible {
+  outline: 2px solid rgba(244, 114, 182, 0.75);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+
+
+.site-title {
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  text-shadow:
     0 1px 0 #ffffff33,
     0 -1px 0 #00000066,
     0 2px 4px #00000055;
 }
 
-tr th, td {
-  border: 1px solid salmon;
-  padding: .4em;
+.site-title:hover {
+  color:#747bff
+}
+
+
+table {
+  width: min(1100px, 100%);
+  max-width: 92vw;
+  margin: 1rem auto;
+  margin-top: 2rem;
+  padding: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+tr th,
+tr td {
+  border: 1px solid rgba(250, 128, 114, 0.751);
+  padding: 0.4em 0.7em;
+  text-align: center;
 }
 
 tr td {
-  border: 1px solid rgb(186, 78, 66);
-  
+  border-color: rgba(186, 78, 66, 0.833);
 }
+
+tbody tr {
+  transition: background 0.15s ease;
+}
+
+tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.icon-button svg {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.icon-button:hover svg {
+  transform: scale(1.15);
+}
+
+/* outer corners only */
+thead tr:first-child th:first-child {
+  border-top-left-radius: 18px;
+}
+
+thead tr:first-child th:last-child {
+  border-top-right-radius: 18px;
+}
+
+tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 18px;
+}
+
+tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 18px;
+}
+
+
 
 input {
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
-button {
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  color:rgb(159, 158, 95);
-  background:rgb(13, 57, 180);
-  padding-top: 1em;
-}
 
 #root {
   max-width: 1280px;
@@ -50,7 +196,8 @@ button {
 }
 
 footer {
-  padding-top: 4em;
+  margin-top: 6em;
+  opacity: 0.7;
 }
 
 
@@ -171,8 +318,7 @@ footer {
 }
 
 .exercise-form input,
-.exercise-form select,
-.exercise-form button {
+.exercise-form select {
   min-height: 48px;
   border-radius: 12px;
   font-size: 1rem;
@@ -205,25 +351,6 @@ footer {
   opacity: 0.75;
   cursor: not-allowed;
   background-color: #415c89;
-}
-
-.exercise-form button {
-  padding: 0 22px;
-  border: none;
-  background: linear-gradient(135deg, #111827, #020617);
-  color: #e2e8f0;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-}
-
-.exercise-form button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-}
-
-.exercise-form button:active {
-  transform: translateY(0);
 }
 
 .form-error,
@@ -295,7 +422,4 @@ footer {
     max-width: 90%;
   }
 
-  .exercise-form button {
-    width: 100%;
-  }
 }

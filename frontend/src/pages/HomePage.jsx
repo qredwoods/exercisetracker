@@ -1,47 +1,39 @@
-import ExerciseTable from '../components/ExerciseTable'
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { apiFetch } from '../api';
+import ExerciseTable from "../components/ExerciseTable";
+import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../utils/api";
 
-function HomePage({setExerciseToEdit}) {
-  const navigate = useNavigate()
-  const [exercises, setExercises] = useState([])
-  const loadExercises = async () => {
+function HomePage({ exercises, setExercises, setExerciseToEdit }) {
+  const navigate = useNavigate();
+
+  const onDelete = async (_id) => {
     try {
-      const exercises = await apiFetch("/api/exercises");
-      setExercises(exercises);
+      await apiFetch(`/api/exercises/${_id}`, { method: "DELETE" });
+      setExercises((prev) => prev.filter((exercise) => exercise._id !== _id));
     } catch (err) {
       alert(err.message);
     }
   };
-  
-  const onDelete = async (_id) => {
 
-  try {
-    await apiFetch(`/api/exercises/${_id}`, { method: "DELETE"});
-    await loadExercises();
-  } catch(err) {
-    alert(err.message)
-  }
-};
-  
   const onEdit = (exerciseToEdit) => {
     setExerciseToEdit(exerciseToEdit);
-    navigate('/edit')
-  }
-
-  useEffect(() => {
-    loadExercises(); 
-   }, []);
+    navigate("/edit");
+  };
 
   return (
     <div>
-    <h2>Exercises Done</h2>
-        <ExerciseTable exercises={exercises} onDelete={onDelete} onEdit={onEdit}/>
-        <button onClick={() => navigate('/create')}>New Entry</button>
+      <ExerciseTable
+        exercises={exercises}
+        onDelete={onDelete}
+        onEdit={onEdit}
+      />
+
+      <div className="cta-row">
+        <button className="cta-button" onClick={() => navigate("/create")}>
+          Log Exercise
+        </button>
+      </div>
     </div>
-  )
+  );
 }
 
-
-export default HomePage
+export default HomePage;
