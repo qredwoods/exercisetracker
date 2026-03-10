@@ -1,6 +1,12 @@
 body {
-  color: green;
+  color: rgb(160, 219, 160);
   background-color: navy;
+  background: linear-gradient(
+    160deg,
+    #091755 0%,
+    #143a90 40%,
+    #17305a 70%,
+    #0f172a 100%);
   font-family: monospace;
   margin: 1em;
   padding: 2em;
@@ -8,6 +14,13 @@ body {
 }
 table{
   padding-bottom: 1em;
+}
+
+h1 {
+    text-shadow:
+    0 1px 0 #ffffff33,
+    0 -1px 0 #00000066,
+    0 2px 4px #00000055;
 }
 
 tr th {
