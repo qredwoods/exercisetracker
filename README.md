@@ -11,6 +11,7 @@ The app allows users to quickly log workouts, track exercise details, and manage
 # Screenshots
 
 ### Early Prototype
+<img width="607" height="405" alt="Screenshot 2026-03-10 at 7 47 42 AM" src="https://github.com/user-attachments/assets/b285916c-53c1-4861-b757-775fa74d3692" />
 
 
 ### Current Version
