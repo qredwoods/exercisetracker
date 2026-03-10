@@ -1,108 +1,229 @@
 import express from "express";
 import * as model from "./model.mjs";
 import "dotenv/config";
-import cors from "cors"
+import cors from "cors";
 
 const app = express();
 
 const ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";
 
-app.use(cors({
-  origin: ORIGIN,
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ORIGIN,
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
 const isReadOnly =
-  process.env.NODE_ENV === "production" && process.env.DEMO_READ_ONLY === "true";
+  process.env.NODE_ENV === "production" &&
+  process.env.DEMO_READ_ONLY === "true";
 
 app.use((req, res, next) => {
-  // Allow safe methods
   if (!isReadOnly) return next();
-  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return next();
+  if (
+    req.method === "GET" ||
+    req.method === "HEAD" ||
+    req.method === "OPTIONS"
+  ) {
+    return next();
+  }
 
   return res.status(403).json({
     error: "Demo is read-only. Run locally for full access.",
   });
 });
 
+function todayIsoLocal() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function isDateValid(date) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
 }
 
-function isBodyValid(body) {
+function validateExerciseBody(body) {
+  const allowedFields = ["name", "reps", "weight", "unit", "date"].sort();
+  const requestFields = Object.keys(body).sort();
+  const fieldsMatch =
+    JSON.stringify(allowedFields) === JSON.stringify(requestFields);
 
-    const allowedFields = ['name','reps','weight', 'unit', 'date'].sort()
-    const requestFields = Object.keys(body).sort()
-    const fieldsMatch = JSON.stringify(allowedFields) === JSON.stringify(requestFields)
-    if (fieldsMatch){
-        const {name, reps, weight, unit, date} = body
-        
-        const validName = (typeof(name) === 'string') && (name.length > 0)
-        const vReps = (typeof(reps) === 'number') && (reps > 0)
-        const vWeight = (typeof(weight) === 'number') && (weight > 0)
-        const vUnit = unit === 'kgs' || unit === 'lbs';
-        
-        const validationResult = validName && vReps && vWeight && vUnit && isDateValid(date)
-        return validationResult
-        
-}}
+  if (!fieldsMatch) {
+    return {
+      valid: false,
+      error: "Please complete all required fields.",
+    };
+  }
+
+  let { name, reps, weight, unit, date } = body;
+
+  if (typeof name !== "string" || !name.trim()) {
+    return {
+      valid: false,
+      error: "Please enter an exercise name.",
+    };
+  }
+
+  if (typeof reps !== "number" || !Number.isFinite(reps) || reps <= 0) {
+    return {
+      valid: false,
+      error: "Reps must be greater than 0.",
+    };
+  }
+
+  if (!["lbs", "kgs", "bodyweight"].includes(unit)) {
+    return {
+      valid: false,
+      error: "Please select a valid unit.",
+    };
+  }
+
+  if (!isDateValid(date)) {
+    return {
+      valid: false,
+      error: "Date must be in YYYY-MM-DD format.",
+    };
+  }
+
+  if (date > todayIsoLocal()) {
+    return {
+      valid: false,
+      error: "Workout date cannot be in the future.",
+    };
+  }
+
+  if (unit === "bodyweight") {
+    weight = 0;
+  }
+
+  if (typeof weight !== "number" || !Number.isFinite(weight) || weight < 0) {
+    return {
+      valid: false,
+      error: "Weight must be a non-negative number.",
+    };
+  }
+
+  return {
+    valid: true,
+    data: {
+      name: name.trim(),
+      reps,
+      weight,
+      unit,
+      date,
+    },
+  };
+}
 
 // health check
-app.get("/health", (_, res) => {
-  res.status(200).json({ status: "ok" });
+app.get("/health", async (_, res) => {
+  try {
+    res.status(200).json({ status: "ok" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
 // create new exercise
 app.post("/api/exercises", async (req, res) => {
-    const body = req.body   
-    if (isBodyValid(body)) {
-            const exercise = await model.createExercise(body);
-       
-        res.status(201).send(exercise);
-    } else res.status(400).send({"Error": "Invalid Request"})
+  try {
+    const validation = validateExerciseBody(req.body);
+
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    const exercise = await model.createExercise(validation.data);
+    res.status(201).json(exercise);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
 // get exercises
 app.get("/api/exercises", async (req, res) => {
-   const results = await model.findExercises(req.query)
-   res.status(200).send(results)
+  try {
+    const results = await model.findExercises(req.query);
+    res.status(200).json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
-
+// get exercise by id
 app.get("/api/exercises/:_id", async (req, res) => {
+  try {
     const result = await model.findExerciseById(req.params._id);
+
     if (result === null) {
-        res.status(404).send({"Error": "Not found"})
+      return res.status(404).json({ error: "Not found" });
     }
-    else res.status(200).send(result)
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
 // update
 app.put("/api/exercises/:_id", async (req, res) => {
-    const body = req.body
-    if (isBodyValid(body)) {
-    const result = await model.updateExercise(req.params._id, body)
-    if (result === null) {
-        res.status(404).send({"Error": "Not found"})
-    }
-    else res.status(200).send(result)
-    } else res.status(400).send({"Error":"Invalid Request"})
-})
+  try {
+    const validation = validateExerciseBody(req.body);
 
-// delete
-app.delete("/api/exercises", async (req, res) => {
-    const result = await model.deleteExercises(req.query)
-    res.status(200).send({deletedCount: result.deletedCount})
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    const result = await model.updateExercise(
+      req.params._id,
+      validation.data
+    );
+
+    if (result === null) {
+      return res.status(404).json({ error: "Not found" });
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
+// delete all (with filter)
+app.delete("/api/exercises", async (req, res) => {
+  try {
+    const result = await model.deleteExercises(req.query);
+    res.status(200).json({ deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
+});
+
+// delete by id
 app.delete("/api/exercises/:_id", async (req, res) => {
-    const result = await model.deleteById(req.params._id)
-    if (result === 0) { 
-        res.status(404).send({"Error": "Not found"})
+  try {
+    const result = await model.deleteById(req.params._id);
+
+    if (result === 0) {
+      return res.status(404).json({ error: "Not found" });
     }
-    else res.sendStatus(204)
+
+    res.sendStatus(204);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
 const PORT = process.env.PORT || 5000;

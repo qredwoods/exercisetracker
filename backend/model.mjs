@@ -38,12 +38,31 @@ async function createConnection(){
 }
 
 // sets up structure of exercise
-const exerciseSchema = mongoose.Schema({ 
-  name: { type: String, required: true },
-  reps: { type: Number, required: true },
-  weight: { type: Number, required: true },
-  unit: { type: String, required: true },
-  date: { type: String, required: true }
+const exerciseSchema = mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  reps: {
+    type: Number,
+    required: true,
+    min: 1,
+  },
+  weight: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  unit: {
+    type: String,
+    required: true,
+    enum: ["lbs", "kgs", "bodyweight"],
+  },
+  date: {
+    type: String,
+    required: true,
+  },
 });
 
 // exercise class
@@ -67,7 +86,7 @@ const findExerciseById = async (id) => {
 }
 
 async function updateExercise(id, update) {
-    return Exercise.findOneAndUpdate({_id: id}, update, {new: true}).exec()
+    return Exercise.findOneAndUpdate({_id: id}, update, {new: true, runValidators: true}).exec()
 }
 
 const deleteExercises = async (filter) => {
