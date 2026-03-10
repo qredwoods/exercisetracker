@@ -10,7 +10,7 @@ let connection = undefined;
  * This function does the following:
  *  1. Connects to the MongoDB server.
  *  2. Drop EXERCISE_COLLECTION if asked to do so.
- *  3. Creates a model class for the movie schema.
+ *  3. Creates a model class for the exercise schema.
  * @param {Boolean} dropCollection If true, drop EXERCISE_COLLECTION
  * 
  */
