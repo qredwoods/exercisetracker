@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
 import ExerciseForm from "../components/ExerciseForm";
 
-const CreateExercisePage = ({ setExercises }) => {
+const CreateExercisePage = ({ setExercises, exerciseDraft }) => {
   const navigate = useNavigate();
 
   const addExercise = async (newExercise) => {
@@ -23,6 +23,7 @@ const CreateExercisePage = ({ setExercises }) => {
     <div>
       <ExerciseForm
         formId="exercise-form"
+        initialExercise={exerciseDraft || {}}
         onSubmit={addExercise}
       />
 

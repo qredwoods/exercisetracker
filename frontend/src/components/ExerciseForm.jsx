@@ -73,13 +73,12 @@ const ExerciseForm = ({
 
   return (
     <div>
-
-
       <p className="form-error" aria-live="polite">
         {formError}
       </p>
 
       <form
+        autoComplete="new-password"
         id={formId}
         className="exercise-form"
         onSubmit={(e) => {
@@ -88,7 +87,6 @@ const ExerciseForm = ({
         }}
       >
         <div className="form-field name-field">
-          <label htmlFor={`${formId}-name`}>Exercise</label>
           <input
             id={`${formId}-name`}
             type="text"
@@ -100,7 +98,6 @@ const ExerciseForm = ({
         </div>
 
         <div className="form-field reps-field">
-          <label htmlFor={`${formId}-reps`}>Reps</label>
           <input
             id={`${formId}-reps`}
             type="number"
@@ -115,12 +112,11 @@ const ExerciseForm = ({
         </div>
 
         <div className="form-field weight-field">
-          <label htmlFor={`${formId}-weight`}>Weight</label>
           <input
             id={`${formId}-weight`}
             type="number"
             min="0"
-            placeholder={isBodyweight ? "Bodyweight only" : "Weight"}
+            placeholder={isBodyweight ? "no added weight" : "Weight"}
             value={isBodyweight ? "" : weight}
             onChange={(e) =>
               setWeight(e.target.value === "" ? "" : Number(e.target.value))
@@ -133,7 +129,6 @@ const ExerciseForm = ({
         </div>
 
         <div className="form-field unit-field">
-          <label htmlFor={`${formId}-unit`}>Unit</label>
           <select
             id={`${formId}-unit`}
             value={unit}
@@ -146,14 +141,13 @@ const ExerciseForm = ({
               }
             }}
           >
-            <option value="lbs">Lbs</option>
-            <option value="kgs">Kgs</option>
-            <option value="bodyweight">Bodyweight</option>
+            <option value="lbs">Unit: Lbs</option>
+            <option value="kgs">Unit: Kgs</option>
+            <option value="bodyweight">Bodyweight only</option>
           </select>
         </div>
 
         <div className="form-field date-field">
-          <label htmlFor={`${formId}-date`}>Date</label>
           <input
             id={`${formId}-date`}
             type="date"

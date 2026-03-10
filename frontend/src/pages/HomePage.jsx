@@ -1,9 +1,11 @@
 import ExerciseTable from "../components/ExerciseTable";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
+import { todayIsoLocal } from "../utils/date";
 
-function HomePage({ exercises, setExercises, setExerciseToEdit }) {
+function HomePage({ exercises, setExercises, setExerciseDraft }) {
   const navigate = useNavigate();
+  const today = todayIsoLocal();
 
   const onDelete = async (_id) => {
     try {
@@ -14,10 +16,20 @@ function HomePage({ exercises, setExercises, setExerciseToEdit }) {
     }
   };
 
-  const onEdit = (exerciseToEdit) => {
-    setExerciseToEdit(exerciseToEdit);
+  const onEdit = (exerciseDraft) => {
+    setExerciseDraft(exerciseDraft);
     navigate("/edit");
   };
+
+  const onDuplicate = (exercise) => {
+  setExerciseDraft({
+    ...exercise,
+    _id: undefined,
+    date: today,
+  });
+  navigate("/create");
+};
+
 
   return (
     <div>
@@ -25,6 +37,7 @@ function HomePage({ exercises, setExercises, setExerciseToEdit }) {
         exercises={exercises}
         onDelete={onDelete}
         onEdit={onEdit}
+        onDuplicate={onDuplicate}
       />
 
       <div className="cta-row">

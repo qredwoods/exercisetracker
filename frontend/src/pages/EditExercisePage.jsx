@@ -2,16 +2,16 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
 import ExerciseForm from "../components/ExerciseForm";
 
-const EditExercisePage = ({ exerciseToEdit, setExercises }) => {
+const EditExercisePage = ({ exerciseDraft, setExercises }) => {
   const navigate = useNavigate();
 
   const updateExercise = async (editedExercise) => {
-    if (!exerciseToEdit?._id) {
+    if (!exerciseDraft?._id) {
       return;
     }
 
     try {
-      const updatedExercise = await apiFetch(`/api/exercises/${exerciseToEdit._id}`, {
+      const updatedExercise = await apiFetch(`/api/exercises/${exerciseDraft._id}`, {
         method: "PUT",
         body: JSON.stringify(editedExercise),
       });
@@ -28,7 +28,7 @@ const EditExercisePage = ({ exerciseToEdit, setExercises }) => {
     }
   };
 
-  if (!exerciseToEdit?._id) {
+  if (!exerciseDraft?._id) {
     return (
       <div>
         <p className="form-error">No exercise selected to edit.</p>
@@ -46,7 +46,7 @@ const EditExercisePage = ({ exerciseToEdit, setExercises }) => {
       <ExerciseForm
         formId="exercise-form"
         title=""
-        initialExercise={exerciseToEdit}
+        initialExercise={exerciseDraft}
         onSubmit={updateExercise}
       />
 

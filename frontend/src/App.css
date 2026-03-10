@@ -269,7 +269,7 @@ footer {
   padding: 20px;
   display: flex;
   align-items: flex-end;
-  gap: 14px;
+  gap: 0;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 18px;
@@ -305,7 +305,7 @@ footer {
 
 .unit-field {
   flex: 0.8;
-  min-width: 90px;
+  min-width: 160px;
 }
 
 .date-field {
@@ -319,21 +319,39 @@ footer {
 
 .exercise-form input,
 .exercise-form select {
-  min-height: 48px;
-  border-radius: 12px;
-  font-size: 1rem;
-}
-
-.exercise-form input,
-.exercise-form select {
   width: 100%;
   max-width: 100%;
+  min-height: 48px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.5);
-  color: #0f172a;
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 0;
+  border: 1px solid rgba(186, 78, 66, 0.833);
+  border-right: none;
+  background-color: transparent;
+  color: inherit;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.exercise-form .form-field:last-child input,
+.exercise-form .form-field:last-child select {
+  border-right: 1px solid rgba(186, 78, 66, 0.833);
+}
+
+.exercise-form .form-field:first-child input,
+.exercise-form .form-field:first-child select {
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+}
+
+.exercise-form .form-field:last-child input,
+.exercise-form .form-field:last-child select {
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
 }
 
 .exercise-form input::placeholder {
@@ -342,12 +360,15 @@ footer {
 
 .exercise-form input:focus,
 .exercise-form select:focus {
+  position: relative;
+  z-index: 1;
   border-color: salmon;
   box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.18);
   background: rgba(255, 255, 255, 0.65);
 }
 
-.exercise-form input:disabled {
+.exercise-form input:disabled,
+.exercise-form .is-disabled {
   opacity: 0.75;
   cursor: not-allowed;
   background-color: #415c89;
@@ -419,7 +440,55 @@ footer {
   .form-field select,
   .form-field button {
     width: 100%;
-    max-width: 90%;
+    max-width: 100%;
   }
 
+  .exercise-form input,
+  .exercise-form select {
+    text-align: center;
+    border-right: 1px solid rgba(186, 78, 66, 0.833);
+    border-bottom: none;
+  }
+
+  .exercise-form .form-field:last-child input,
+  .exercise-form .form-field:last-child select {
+    border-bottom: 1px solid rgba(186, 78, 66, 0.833);
+  }
+
+  .exercise-form .form-field:first-child input,
+  .exercise-form .form-field:first-child select {
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .exercise-form .form-field:last-child input,
+  .exercise-form .form-field:last-child select {
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+    .prefix-shell input,
+  .suffix-shell input {
+    text-align: center;
+  }
+
+  .prefix-shell input {
+    padding-left: 14px;
+  }
+
+  .suffix-shell input {
+    padding-right: 14px;
+  }
+
+  .input-affix--prefix {
+    left: 18px;
+  }
+
+  .input-affix--suffix {
+    right: 18px;
+  }
 }

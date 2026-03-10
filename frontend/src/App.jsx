@@ -9,7 +9,7 @@ import { apiFetch } from "./utils/api";
 
 function App() {
   const [exercises, setExercises] = useState([]);
-  const [exerciseToEdit, setExerciseToEdit] = useState(null);
+  const [exerciseDraft, setExerciseDraft] = useState(null);
 
   useEffect(() => {
     loadExercises();
@@ -42,7 +42,7 @@ function App() {
             <HomePage
               exercises={exercises}
               setExercises={setExercises}
-              setExerciseToEdit={setExerciseToEdit}
+              setExerciseDraft={setExerciseDraft}
             />
           }
         />
@@ -51,6 +51,8 @@ function App() {
           element={
             <CreateExercisePage
               setExercises={setExercises}
+              exerciseDraft={exerciseDraft}
+              setExerciseDraft={setExerciseDraft}
             />
           }
         />
@@ -58,7 +60,7 @@ function App() {
           path="/edit"
           element={
             <EditExercisePage
-              exerciseToEdit={exerciseToEdit}
+              exerciseDraft={exerciseDraft}
               setExercises={setExercises}
             />
           }
