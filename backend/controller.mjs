@@ -82,7 +82,7 @@ function validateExerciseBody(body) {
   if (typeof reps !== "number" || !Number.isFinite(reps) || reps <= 0) {
     return {
       valid: false,
-      error: "Reps must be greater than 0.",
+      error: "Reps must be a number greater than zero.",
     };
   }
 
@@ -107,15 +107,15 @@ function validateExerciseBody(body) {
     };
   }
 
-  if (unit === "bodyweight") {
-    weight = 0;
-  }
-
-  if (typeof weight !== "number" || !Number.isFinite(weight) || weight < 0) {
+  if (typeof weight !== "number" || !Number.isFinite(weight) || weight <= 0) {
     return {
       valid: false,
-      error: "Weight must be a non-negative number.",
+      error: "Weight must be a number greater than zero.",
     };
+  }
+  // order matters
+  if (unit === "bodyweight") {
+    weight = 0;
   }
 
   return {
