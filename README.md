@@ -6,6 +6,12 @@ LiftLog is a full-stack MERN application featuring a responsive React frontend a
 
 The app allows users to quickly log workouts, track exercise details, and manage their training history through a clean and responsive interface.
 
+## ⚠️ 3/12/26: In Progress: Auth Integration
+Backend auth is complete (JWT access/refresh tokens, protected routes). `test-requests.http` updated.
+Frontend auth UI is next — app will not load exercises until that lands. 
+
+### Note - title is changing, new working title in code
+
 ---
 
 # Screenshots
