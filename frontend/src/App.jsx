@@ -29,10 +29,10 @@ function App() {
       <header>
         <h1>
           <Link to="/" className="site-title">
-            LiftLog
+            SparkMvmt
           </Link>
         </h1>
-        <p>Track Workouts, Stay Accountable</p>
+        <p>the story of moving how you want to</p>
       </header>
 
       <Routes>

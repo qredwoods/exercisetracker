@@ -1,5 +1,8 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import * as model from "./model.mjs";
+import { authRouter } from "./auth.mjs";
+import { requireAuth } from "./middleware.mjs";
 import "dotenv/config";
 import cors from "cors";
 
@@ -15,6 +18,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(cookieParser());
 
 const isReadOnly =
   process.env.NODE_ENV === "production" &&
@@ -34,6 +38,12 @@ app.use((req, res, next) => {
     error: "Demo is read-only. Run locally for full access.",
   });
 });
+
+// ── auth routes (public) ────────────────────────────────
+app.use("/api/auth", authRouter);
+
+// ── everything below requires authentication ────────────
+app.use("/api/exercises", requireAuth);
 
 function todayIsoLocal() {
   const d = new Date();
@@ -120,7 +130,7 @@ function validateExerciseBody(body) {
   };
 }
 
-// health check
+// health check (public)
 app.get("/health", async (_, res) => {
   try {
     res.status(200).json({ status: "ok" });
@@ -130,7 +140,7 @@ app.get("/health", async (_, res) => {
   }
 });
 
-// create new exercise
+// create new exercise (scoped to user)
 app.post("/api/exercises", async (req, res) => {
   try {
     const validation = validateExerciseBody(req.body);
@@ -139,7 +149,10 @@ app.post("/api/exercises", async (req, res) => {
       return res.status(400).json({ error: validation.error });
     }
 
-    const exercise = await model.createExercise(validation.data);
+    const exercise = await model.createExercise({
+      ...validation.data,
+      userId: req.userId,
+    });
     res.status(201).json(exercise);
   } catch (err) {
     console.error(err);
@@ -147,10 +160,13 @@ app.post("/api/exercises", async (req, res) => {
   }
 });
 
-// get exercises
+// get exercises (scoped to user)
 app.get("/api/exercises", async (req, res) => {
   try {
-    const results = await model.findExercises(req.query);
+    const results = await model.findExercises({
+      ...req.query,
+      userId: req.userId,
+    });
     res.status(200).json(results);
   } catch (err) {
     console.error(err);
@@ -158,12 +174,12 @@ app.get("/api/exercises", async (req, res) => {
   }
 });
 
-// get exercise by id
+// get exercise by id (scoped to user)
 app.get("/api/exercises/:_id", async (req, res) => {
   try {
     const result = await model.findExerciseById(req.params._id);
 
-    if (result === null) {
+    if (result === null || result.userId?.toString() !== req.userId) {
       return res.status(404).json({ error: "Not found" });
     }
 
@@ -174,7 +190,7 @@ app.get("/api/exercises/:_id", async (req, res) => {
   }
 });
 
-// update
+// update (scoped to user)
 app.put("/api/exercises/:_id", async (req, res) => {
   try {
     const validation = validateExerciseBody(req.body);
@@ -183,9 +199,11 @@ app.put("/api/exercises/:_id", async (req, res) => {
       return res.status(400).json({ error: validation.error });
     }
 
+    // only update if the exercise belongs to this user
     const result = await model.updateExercise(
       req.params._id,
-      validation.data
+      validation.data,
+      req.userId
     );
 
     if (result === null) {
@@ -199,10 +217,13 @@ app.put("/api/exercises/:_id", async (req, res) => {
   }
 });
 
-// delete all (with filter)
+// delete all (scoped to user)
 app.delete("/api/exercises", async (req, res) => {
   try {
-    const result = await model.deleteExercises(req.query);
+    const result = await model.deleteExercises({
+      ...req.query,
+      userId: req.userId,
+    });
     res.status(200).json({ deletedCount: result.deletedCount });
   } catch (err) {
     console.error(err);
@@ -210,10 +231,10 @@ app.delete("/api/exercises", async (req, res) => {
   }
 });
 
-// delete by id
+// delete by id (scoped to user)
 app.delete("/api/exercises/:_id", async (req, res) => {
   try {
-    const result = await model.deleteById(req.params._id);
+    const result = await model.deleteById(req.params._id, req.userId);
 
     if (result === 0) {
       return res.status(404).json({ error: "Not found" });

@@ -63,16 +63,20 @@ const exerciseSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true,
+  },
 });
 
 // exercise class
 const Exercise = mongoose.model("Exercise", exerciseSchema); 
 
 const createExercise = async (body) => { 
-  const {name, reps, weight, unit, date} = body
-  // Call the constructor to create an instance of the model class exercise
-  const exercise = await new Exercise({name: name, reps: reps, weight: weight, unit: unit, date: date}); 
-  // Call save to persist this object as a document in MongoDB 
+  const {name, reps, weight, unit, date, userId} = body;
+  const exercise = new Exercise({name, reps, weight, unit, date, userId}); 
   return exercise.save();
 }
 
@@ -85,16 +89,21 @@ const findExerciseById = async (id) => {
     return Exercise.findById(id).exec();
 }
 
-async function updateExercise(id, update) {
-    return Exercise.findOneAndUpdate({_id: id}, update, {new: true, runValidators: true}).exec()
+async function updateExercise(id, update, userId) {
+    // only update if exercise belongs to user
+    return Exercise.findOneAndUpdate(
+      { _id: id, userId },
+      update,
+      { new: true, runValidators: true }
+    ).exec();
 }
 
 const deleteExercises = async (filter) => {
     return Exercise.deleteMany(filter).exec();
 }
 
-const deleteById = async (_id) => {
-  const result = await Exercise.deleteOne({ _id: _id });
+const deleteById = async (_id, userId) => {
+  const result = await Exercise.deleteOne({ _id, userId });
   return result.deletedCount;
 }
 
