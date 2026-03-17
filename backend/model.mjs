@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import 'dotenv/config';
 
-const EXERCISE_DB_NAME = 'exercises_db';
+
 const EXERCISE_COLLECTION = 'exercises';
 
 let connection = undefined;
@@ -32,8 +32,7 @@ async function connect(dropCollection){
  * @returns A connection to the server
  */
 async function createConnection(){
-    await mongoose.connect(process.env.MONGODB_URI, 
-                {dbName: EXERCISE_DB_NAME});
+    await mongoose.connect(process.env.MONGODB_URI);
     return mongoose.connection;
 }
 
