@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
-
-const SALT_ROUNDS = 12;
+import argon2 from 'argon2';
 
 const userSchema = mongoose.Schema({
   firstName: {
@@ -37,7 +35,7 @@ userSchema.methods.toJSON = function () {
 const User = mongoose.model('User', userSchema);
 
 async function createUser(firstName, lastName, email, password) {
-  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+  const passwordHash = await argon2.hash(password);
   const user = new User({ firstName, lastName, email, passwordHash });
   return user.save();
 }
@@ -47,7 +45,7 @@ async function findUserByEmail(email) {
 }
 
 async function verifyPassword(user, password) {
-  return bcrypt.compare(password, user.passwordHash);
+  return argon2.verify(user.passwordHash, password);
 }
 
 export { User, createUser, findUserByEmail, verifyPassword };

@@ -51,8 +51,16 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ error: 'First and last name are required.' });
     }
 
+    if (firstName.trim().length > 50 || lastName.trim().length > 50) {
+      return res.status(400).json({ error: 'Name must be 50 characters or less.' });
+    }
+
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
+    if (email.length > 254) {
+      return res.status(400).json({ error: 'Email is too long.' });
     }
 
     if (!validator.isEmail(email)) {
@@ -61,6 +69,10 @@ router.post('/signup', async (req, res) => {
 
     if (password.length < 8) {
       return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+    }
+
+    if (password.length > 128) {
+      return res.status(400).json({ error: 'Password must be 128 characters or less.' });
     }
 
     if (!/[A-Z]/.test(password)) {

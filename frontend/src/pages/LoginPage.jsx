@@ -101,6 +101,7 @@ export default function LoginPage({ onAuth }) {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 autoComplete="given-name"
+                maxLength={50}
               />
               <input
                 type="text"
@@ -108,6 +109,7 @@ export default function LoginPage({ onAuth }) {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 autoComplete="family-name"
+                maxLength={50}
               />
             </div>
           )}
@@ -117,6 +119,7 @@ export default function LoginPage({ onAuth }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
+            maxLength={254}
             autoFocus
           />
           <div className="password-field">
@@ -126,6 +129,7 @@ export default function LoginPage({ onAuth }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete={isSignup ? "new-password" : "current-password"}
+              maxLength={128}
             />
             <button
               type="button"
