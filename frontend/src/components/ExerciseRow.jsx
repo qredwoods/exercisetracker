@@ -25,8 +25,7 @@ const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate }) => {
     <tr>
       <td>{name}</td>
       <td>{reps}</td>
-      <td>{isBodyweight ? "BW" : weight}</td>
-      <td>{isBodyweight ? "—" : unit}</td>
+      <td>{isBodyweight ? "BW" : `${weight} ${unit}`}</td>
       <td>{formatDisplayDate(date)}</td>
 
       <td>
@@ -65,4 +64,5 @@ const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate }) => {
   );
 };
 
+export { formatDisplayDate };
 export default ExerciseRow;

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import ExerciseRow from './ExerciseRow'
+import ExerciseRow, { formatDisplayDate } from './ExerciseRow'
 
 const EXAMPLE_ROW = {
   name: "Example — Barbell Squat",
@@ -25,7 +25,6 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate}) => {
             <th>Name</th>
             <th>Reps</th>
             <th>Weight</th>
-            <th>Unit</th>
             <th>Date</th>
             <th colSpan={3}>Actions</th>
           </tr>
@@ -35,9 +34,8 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate}) => {
           <tr className="example-row">
             <td>{EXAMPLE_ROW.name}</td>
             <td>{EXAMPLE_ROW.reps}</td>
-            <td>{EXAMPLE_ROW.weight}</td>
-            <td>{EXAMPLE_ROW.unit}</td>
-            <td>{EXAMPLE_ROW.date}</td>
+            <td>{`${EXAMPLE_ROW.weight} ${EXAMPLE_ROW.unit}`}</td>
+            <td>{formatDisplayDate(EXAMPLE_ROW.date)}</td>
             <td colSpan={3}></td>
           </tr>
         ) : (
