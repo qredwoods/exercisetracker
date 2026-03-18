@@ -35,6 +35,11 @@ a:hover {
 }
 
 footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
   color: #747bff;
 }
 
@@ -501,32 +506,22 @@ footer {
 
 /* AUTH */
 
-/* header layout with logout */
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  position: relative;
-}
+/* signout */
 
-.logout-btn {
-  position: absolute;
-  right: 0;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
+
+.signout-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.4rem;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
-.logout-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.95);
+.signout-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* auth page */
@@ -597,6 +592,34 @@ footer {
   border-color: rgba(144, 238, 144, 0.4);
 }
 
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 2.8rem;
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.eye-toggle:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .auth-submit {
   margin-top: 0.5rem;
   padding: 0.75rem;
@@ -618,6 +641,41 @@ footer {
 .auth-submit:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.password-rules {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.password-rules li {
+  white-space: nowrap;
+}
+
+.password-rules li::before {
+  margin-right: 0.3em;
+}
+
+.rule-pass {
+  color: #90ee90;
+}
+
+.rule-pass::before {
+  content: "\2713";
+}
+
+.rule-fail {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.rule-fail::before {
+  content: "\2717";
 }
 
 .auth-toggle {

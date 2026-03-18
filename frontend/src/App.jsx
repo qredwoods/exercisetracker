@@ -84,16 +84,11 @@ if (authLoading) {
   return (
     <>
       <header>
-        <div className="header-row">
           <h1>
             <Link to="/" className="site-title">
               SparkMvmt
             </Link>
           </h1>
-          <button className="logout-btn" onClick={handleLogout}>
-            Log out
-          </button>
-        </div>
         <p> track exercises, energize your life</p>
       </header>
 
@@ -130,7 +125,12 @@ if (authLoading) {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
-      <footer>©2026 Quinn Redwoods</footer>
+      <footer> 
+          <button className="signout-btn" onClick={handleLogout}>
+            Sign out
+          </button>
+        <span className="copyright"> ©2026 Quinn Redwoods</span>
+        </footer>
     </>
   );
 }
