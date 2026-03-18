@@ -4,6 +4,16 @@ import bcrypt from 'bcrypt';
 const SALT_ROUNDS = 12;
 
 const userSchema = mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   email: {
     type: String,
     required: true,
@@ -26,9 +36,9 @@ userSchema.methods.toJSON = function () {
 
 const User = mongoose.model('User', userSchema);
 
-async function createUser(email, password) {
+async function createUser(firstName, lastName, email, password) {
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = new User({ email, passwordHash });
+  const user = new User({ firstName, lastName, email, passwordHash });
   return user.save();
 }
 

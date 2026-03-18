@@ -1,8 +1,21 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
+import validator from 'validator';
 import { createUser, findUserByEmail, verifyPassword } from './userModel.mjs';
 
 const router = express.Router();
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 7,                    // 7 attempts per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Please try again later.' },
+});
+
+router.use('/login', authLimiter);
+router.use('/signup', authLimiter);
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'dev-access-secret-change-me';
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'dev-refresh-secret-change-me';
@@ -32,10 +45,18 @@ function setRefreshCookie(res, token) {
 // ── signup ──────────────────────────────────────────────
 router.post('/signup', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
+
+    if (!firstName?.trim() || !lastName?.trim()) {
+      return res.status(400).json({ error: 'First and last name are required.' });
+    }
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
 
     if (password.length < 8) {
@@ -59,7 +80,7 @@ router.post('/signup', async (req, res) => {
       return res.status(409).json({ error: 'An account with this email already exists.' });
     }
 
-    const user = await createUser(email, password);
+    const user = await createUser(firstName.trim(), lastName.trim(), email, password);
 
     const accessToken = signAccessToken(user._id);
     const refreshToken = signRefreshToken(user._id);
@@ -79,6 +100,10 @@ router.post('/login', async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
 
     const user = await findUserByEmail(email);

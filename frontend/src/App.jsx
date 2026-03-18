@@ -4,7 +4,7 @@ import EditExercisePage from "./pages/EditExercisePage";
 import CreateExercisePage from "./pages/CreateExercisePage";
 import LoginPage from "./pages/LoginPage";
 
-import { Link, Routes, Route, Navigate } from "react-router-dom";
+import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiFetch, logout, tryRestoreSession } from "./utils/api";
 
@@ -50,11 +50,14 @@ function App() {
     setUser(userData);
   };
 
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     await logout();
     setUser(null);
     setExercises([]);
     setExerciseDraft(null);
+    navigate("/");
   };
 
 // show nothing while checking for existing session

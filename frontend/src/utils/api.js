@@ -92,10 +92,10 @@ export async function login(email, password) {
   return data.user;
 }
 
-export async function signup(email, password) {
+export async function signup(firstName, lastName, email, password) {
   const data = await apiFetch("/api/auth/signup", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ firstName, lastName, email, password }),
   });
   setAccessToken(data.accessToken);
   return data.user;

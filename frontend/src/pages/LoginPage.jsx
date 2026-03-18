@@ -3,6 +3,8 @@ import { login, signup } from "../utils/api";
 
 export default function LoginPage({ onAuth }) {
   const [isSignup, setIsSignup] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,8 +17,18 @@ export default function LoginPage({ onAuth }) {
     e.preventDefault();
     setError("");
 
+    if (isSignup && (!firstName.trim() || !lastName.trim())) {
+      setError("First and last name are required.");
+      return;
+    }
+
     if (!email.trim() || !password) {
       setError("Email and password are required.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -47,7 +59,7 @@ export default function LoginPage({ onAuth }) {
     setLoading(true);
     try {
       const user = isSignup
-        ? await signup(email, password)
+        ? await signup(firstName, lastName, email, password)
         : await login(email, password);
       onAuth(user);
     } catch (err) {
@@ -60,6 +72,8 @@ export default function LoginPage({ onAuth }) {
   const toggleMode = () => {
     setIsSignup(!isSignup);
     setError("");
+    setFirstName("");
+    setLastName("");
     setPassword("");
     setConfirmPassword("");
     setShowPassword(false);
@@ -79,6 +93,24 @@ export default function LoginPage({ onAuth }) {
         {error && <div className="auth-error">{error}</div>}
 
         <div className="auth-form">
+          {isSignup && (
+            <div className="name-row">
+              <input
+                type="text"
+                placeholder="First name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                autoComplete="given-name"
+              />
+              <input
+                type="text"
+                placeholder="Last name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                autoComplete="family-name"
+              />
+            </div>
+          )}
           <input
             type="email"
             placeholder="Email"

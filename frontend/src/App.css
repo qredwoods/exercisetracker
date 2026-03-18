@@ -592,6 +592,16 @@ footer {
   border-color: rgba(144, 238, 144, 0.4);
 }
 
+.name-row {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.name-row input {
+  flex: 1;
+  min-width: 0;
+}
+
 .password-field {
   position: relative;
 }
