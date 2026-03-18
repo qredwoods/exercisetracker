@@ -5,14 +5,17 @@ import CreateExercisePage from "./pages/CreateExercisePage";
 import LoginPage from "./pages/LoginPage";
 
 import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiFetch, logout, tryRestoreSession } from "./utils/api";
+import Toast from "./components/Toast";
 
 function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [exercises, setExercises] = useState([]);
   const [exerciseDraft, setExerciseDraft] = useState(null);
+  const [toast, setToast] = useState(null);
+  const showToast = useCallback((message) => setToast(message), []);
 
   // try to restore session from refresh cookie on mount
   useEffect(() => {
@@ -101,6 +104,7 @@ if (authLoading) {
               exercises={exercises}
               setExercises={setExercises}
               setExerciseDraft={setExerciseDraft}
+              showToast={showToast}
             />
           }
         />
@@ -111,6 +115,7 @@ if (authLoading) {
               setExercises={setExercises}
               exerciseDraft={exerciseDraft}
               setExerciseDraft={setExerciseDraft}
+              showToast={showToast}
             />
           }
         />
@@ -120,18 +125,21 @@ if (authLoading) {
             <EditExercisePage
               exerciseDraft={exerciseDraft}
               setExercises={setExercises}
+              showToast={showToast}
             />
           }
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
-      <footer> 
+      <footer>
           <button className="signout-btn" onClick={handleLogout}>
             Sign out
           </button>
         <span className="copyright"> ©2026 Quinn Redwoods</span>
         </footer>
+
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </>
   );
 }

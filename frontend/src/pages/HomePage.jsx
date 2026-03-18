@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
 import { todayIsoLocal } from "../utils/date";
 
-function HomePage({ user, exercises, setExercises, setExerciseDraft }) {
+function HomePage({ user, exercises, setExercises, setExerciseDraft, showToast }) {
   const navigate = useNavigate();
   const today = todayIsoLocal();
 
@@ -12,7 +12,7 @@ function HomePage({ user, exercises, setExercises, setExerciseDraft }) {
       await apiFetch(`/api/exercises/${_id}`, { method: "DELETE" });
       setExercises((prev) => prev.filter((exercise) => exercise._id !== _id));
     } catch (err) {
-      alert(err.message);
+      showToast(err.message);
     }
   };
 

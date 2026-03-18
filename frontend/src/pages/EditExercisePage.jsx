@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
 import ExerciseForm from "../components/ExerciseForm";
 
-const EditExercisePage = ({ exerciseDraft, setExercises }) => {
+const EditExercisePage = ({ exerciseDraft, setExercises, showToast }) => {
   const navigate = useNavigate();
 
   const updateExercise = async (editedExercise) => {
@@ -24,7 +24,7 @@ const EditExercisePage = ({ exerciseDraft, setExercises }) => {
 
       navigate("/");
     } catch (err) {
-      alert(err.message);
+      showToast(err.message);
     }
   };
 

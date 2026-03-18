@@ -121,15 +121,13 @@ function validateExerciseBody(body) {
     };
   }
 
-  if (typeof weight !== "number" || !Number.isFinite(weight) || weight <= 0) {
+  if (unit === "bodyweight") {
+    weight = 0;
+  } else if (typeof weight !== "number" || !Number.isFinite(weight) || weight <= 0) {
     return {
       valid: false,
       error: "Weight must be a number greater than zero.",
     };
-  }
-  // order matters
-  if (unit === "bodyweight") {
-    weight = 0;
   }
 
   return {
