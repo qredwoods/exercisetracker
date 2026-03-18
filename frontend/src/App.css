@@ -187,12 +187,24 @@ tbody tr:hover td {
 }
 
 .welcome-line {
-  font-family: 'Pacifico', cursive;
+  font-family: 'Dancing Script', cursive;
   font-size: 2rem;
   color: #1a1008;
   margin-bottom: 0.6rem;
   animation: warm-up 3s 0.9s ease-out forwards;
   text-shadow: none;
+}
+
+.welcome-line.no-animate {
+  color: #e8edd5;
+  text-shadow: 0 0 10px rgba(232, 237, 213, 0.35), 0 0 25px rgba(232, 237, 213, 0.18), 0 0 50px rgba(220, 230, 200, 0.08);
+  animation: none;
+}
+
+.underline-reveal.no-animate {
+  color: rgb(160, 219, 160);
+  text-shadow: 0 0 8px rgba(160, 219, 160, 0.25), 0 0 20px rgba(160, 219, 160, 0.1);
+  animation: none;
 }
 
 @keyframes warm-up {
@@ -226,6 +238,11 @@ tbody tr:hover td {
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes heading-warm {
+  0%   { color: #8a7058; text-shadow: none; }
+  100% { color: #e8edd5; text-shadow: 0 0 6px rgba(232, 237, 213, 0.15), 0 0 14px rgba(220, 230, 200, 0.06); }
 }
 
 .icon-button {
@@ -280,60 +297,6 @@ footer {
 
 
 
-.exercise-form {
-  width: min(1100px, 100%);
-  max-width: 92vw;
-  margin: 1rem auto;
-  padding: 20px;
-  display: flex;
-  align-items: flex-end;
-  gap: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 18px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-field label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: #cbd5e1;
-}
-
-.name-field {
-  flex: 2.2;
-  min-width: 220px;
-}
-
-.reps-field,
-.weight-field {
-  flex: 1;
-  min-width: 110px;
-}
-
-.unit-field {
-  flex: 0.8;
-  min-width: 90px;
-}
-
-.date-field {
-  flex: 1;
-  min-width: 150px;
-}
-
-.submit-field {
-  flex: 0 0 auto;
-}
-
 *,
 *::before,
 *::after {
@@ -343,7 +306,7 @@ footer {
 .exercise-form {
   width: min(1100px, 100%);
   max-width: 92vw;
-  margin: 1rem auto;
+  margin: 0 auto 1rem;
   padding: 20px;
   display: flex;
   align-items: flex-end;
@@ -456,6 +419,22 @@ footer {
   opacity: 0.75;
   cursor: not-allowed;
   background-color: #415c89;
+}
+
+.form-heading {
+  font-size: 1.4rem;
+  font-family: 'Dancing Script', cursive;
+  color: #8a7058;
+  text-shadow: none;
+  margin-top: 2rem;
+  margin-bottom: -0.8rem;
+  animation: heading-warm 1.2s 0.3s ease-out forwards;
+}
+
+.form-heading.no-animate {
+  color: #e8edd5;
+  text-shadow: 0 0 6px rgba(232, 237, 213, 0.15), 0 0 14px rgba(220, 230, 200, 0.06);
+  animation: none;
 }
 
 .form-error,

@@ -52,6 +52,8 @@ function App() {
     setUser(null);
     setExercises([]);
     setExerciseDraft(null);
+    sessionStorage.removeItem("headingSeen");
+    sessionStorage.removeItem("welcomeSeen");
     navigate("/");
   };
 

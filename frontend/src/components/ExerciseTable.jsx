@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import ExerciseRow from './ExerciseRow'
 
 const EXAMPLE_ROW = {
@@ -10,6 +11,11 @@ const EXAMPLE_ROW = {
 
 const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate}) => {
   const isEmpty = exercises.length === 0;
+  const [animate] = useState(() => {
+    if (sessionStorage.getItem("welcomeSeen")) return false;
+    sessionStorage.setItem("welcomeSeen", "1");
+    return true;
+  });
 
   return (
     <div>
@@ -42,8 +48,8 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate}) => {
       </table>
       {isEmpty && (
         <div className="empty-hint">
-          <p className="welcome-line">Welcome{user?.firstName ? `, ${user.firstName}` : ""}.</p>
-          <p>This is your <span className="underline-reveal">exercise log</span> — everything you track shows up here.</p>
+          <p className={`welcome-line${animate ? "" : " no-animate"}`}>Welcome{user?.firstName ? `, ${user.firstName}` : ""}.</p>
+          <p>This is your <span className={`underline-reveal${animate ? "" : " no-animate"}`}>exercise log</span> — everything you track shows up here.</p>
           <p>Let's get started!</p>
         </div>
       )}

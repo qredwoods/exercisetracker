@@ -43,6 +43,7 @@ const EditExercisePage = ({ exerciseDraft, setExercises }) => {
 
   return (
     <div>
+      <p className="form-heading">Make a change</p>
       <ExerciseForm
         formId="exercise-form"
         title=""
