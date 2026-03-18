@@ -90,7 +90,7 @@ export default function LoginPage({ onAuth }) {
   return (
     <main className="auth-page">
       <div className="auth-card">
-        <h2>{isSignup ? "Create Account" : "Welcome Back"}</h2>
+        <h2>{isSignup ? "Create Account" : "Welcome"}</h2>
         <p className="auth-subtitle">
           {isSignup
             ? "Start tracking your workouts"
