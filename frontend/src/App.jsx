@@ -14,16 +14,11 @@ function App() {
   const [exercises, setExercises] = useState([]);
   const [exerciseDraft, setExerciseDraft] = useState(null);
 
-  // try to restore session from refresh on cookie mount
+  // try to restore session from refresh cookie on mount
   useEffect(() => {
     tryRestoreSession()
-      .then((restored) => {
-        if (restored) {
-          // token is valid - set a minimal user object
-          // (refresh doesn't return user info, 
-          // so just mark as authenticated)
-          setUser({ restored: true });
-        }
+      .then((user) => {
+        if (user) setUser(user);
       })
       .finally(() => setAuthLoading(false));
   }, [])

@@ -92,10 +92,10 @@ export async function login(email, password) {
   return data.user;
 }
 
-export async function signup(firstName, lastName, email, password) {
+export async function signup(firstName, lastName, email, password, ageConfirmed) {
   const data = await apiFetch("/api/auth/signup", {
     method: "POST",
-    body: JSON.stringify({ firstName, lastName, email, password }),
+    body: JSON.stringify({ firstName, lastName, email, password, ageConfirmed }),
   });
   setAccessToken(data.accessToken);
   return data.user;
@@ -109,8 +109,14 @@ export async function logout() {
   }
 }
 
+export async function fetchMe() {
+  const data = await apiFetch("/api/auth/me");
+  return data.user;
+}
+
 // attempt to restore session from refresh cookie on app load
 export async function tryRestoreSession() {
   const token = await refreshAccessToken();
-  return token !== null;
+  if (!token) return null;
+  return fetchMe();
 }

@@ -23,6 +23,14 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  ageConfirmed: {
+    type: Boolean,
+    required: true,
+  },
+  ageConfirmedAt: {
+    type: Date,
+    required: true,
+  },
 }, { timestamps: true });
 
 // never return passwordHash in JSON
@@ -36,7 +44,11 @@ const User = mongoose.model('User', userSchema);
 
 async function createUser(firstName, lastName, email, password) {
   const passwordHash = await argon2.hash(password);
-  const user = new User({ firstName, lastName, email, passwordHash });
+  const user = new User({
+    firstName, lastName, email, passwordHash,
+    ageConfirmed: true,
+    ageConfirmedAt: new Date(),
+  });
   return user.save();
 }
 

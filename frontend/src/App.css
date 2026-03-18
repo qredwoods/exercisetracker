@@ -688,6 +688,22 @@ footer {
   content: "\2717";
 }
 
+.age-confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+
+.age-confirm input[type="checkbox"] {
+  accent-color: #90ee90;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
 .auth-toggle {
   margin-top: 1.5rem;
   color: rgba(255, 255, 255, 0.5);

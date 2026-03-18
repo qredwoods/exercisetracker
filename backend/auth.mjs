@@ -45,7 +45,11 @@ function setRefreshCookie(res, token) {
 // ── signup ──────────────────────────────────────────────
 router.post('/signup', async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, ageConfirmed } = req.body;
+
+    if (!ageConfirmed) {
+      return res.status(400).json({ error: 'You must confirm you are 13 or older.' });
+    }
 
     if (!firstName?.trim() || !lastName?.trim()) {
       return res.status(400).json({ error: 'First and last name are required.' });

@@ -12,6 +12,7 @@ export default function LoginPage({ onAuth }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,10 +57,15 @@ export default function LoginPage({ onAuth }) {
       }
     }
 
+    if (isSignup && !ageConfirmed) {
+      setError("You must confirm you are 13 or older.");
+      return;
+    }
+
     setLoading(true);
     try {
       const user = isSignup
-        ? await signup(firstName, lastName, email, password)
+        ? await signup(firstName, lastName, email, password, ageConfirmed)
         : await login(email, password);
       onAuth(user);
     } catch (err) {
@@ -78,6 +84,7 @@ export default function LoginPage({ onAuth }) {
     setConfirmPassword("");
     setShowPassword(false);
     setShowConfirm(false);
+    setAgeConfirmed(false);
   };
 
   return (
@@ -198,6 +205,16 @@ export default function LoginPage({ onAuth }) {
                 )}
               </button>
             </div>
+          )}
+          {isSignup && (
+            <label className="age-confirm">
+              <input
+                type="checkbox"
+                checked={ageConfirmed}
+                onChange={(e) => setAgeConfirmed(e.target.checked)}
+              />
+              I confirm I am 13 years or older
+            </label>
           )}
           <button
             className="auth-submit"

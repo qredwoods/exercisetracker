@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import * as model from "./model.mjs";
+import { User } from "./userModel.mjs";
 import { authRouter } from "./auth.mjs";
 import { requireAuth } from "./middleware.mjs";
 import "dotenv/config";
@@ -43,6 +44,19 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRouter);
 
 // ── everything below requires authentication ────────────
+app.get("/api/auth/me", requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    res.status(200).json({ user });
+  } catch (err) {
+    console.error("Me error:", err);
+    res.status(500).json({ error: "Server error." });
+  }
+});
+
 app.use("/api/exercises", requireAuth);
 
 function todayIsoLocal() {
