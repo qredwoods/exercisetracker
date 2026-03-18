@@ -17,12 +17,16 @@ const authLimiter = rateLimit({
 router.use('/login', authLimiter);
 router.use('/signup', authLimiter);
 
+const IS_PROD = process.env.NODE_ENV === 'production';
+
+if (IS_PROD && (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET)) {
+  throw new Error('ACCESS_TOKEN_SECRET and REFRESH_TOKEN_SECRET must be set in production.');
+}
+
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'dev-access-secret-change-me';
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'dev-refresh-secret-change-me';
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '7d';
-
-const IS_PROD = process.env.NODE_ENV === 'production';
 
 function signAccessToken(userId) {
   return jwt.sign({ userId }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
