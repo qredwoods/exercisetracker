@@ -155,6 +155,79 @@ tbody tr:hover td {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.example-row td {
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.empty-hint {
+  color: rgba(250, 170, 160, 0.95);
+  font-size: 0.9rem;
+  margin-top: 1.2rem;
+  animation: fade-in 0.8s ease-in;
+}
+
+.empty-hint p {
+  margin: 0.3rem 0;
+}
+
+.underline-reveal {
+  color: rgba(250, 170, 160, 0.5);
+  animation: secondary-flicker 1.8s 3s ease-out forwards;
+}
+
+@keyframes secondary-flicker {
+  0%   { color: rgba(250, 170, 160, 0.5); }
+  8%   { color: rgba(232, 237, 213, 0.8); }
+  14%  { color: rgba(250, 170, 160, 0.5); }
+  28%  { color: rgba(232, 237, 213, 0.7); }
+  36%  { color: rgba(250, 170, 160, 0.55); }
+  50%  { color: rgb(160, 219, 160); text-shadow: 0 0 6px rgba(160, 219, 160, 0.3); }
+  100% { color: rgb(160, 219, 160); text-shadow: 0 0 8px rgba(160, 219, 160, 0.25), 0 0 20px rgba(160, 219, 160, 0.1); }
+}
+
+.welcome-line {
+  font-family: 'Pacifico', cursive;
+  font-size: 2rem;
+  color: #1a1008;
+  margin-bottom: 0.6rem;
+  animation: warm-up 3s 0.9s ease-out forwards;
+  text-shadow: none;
+}
+
+@keyframes warm-up {
+  /* dark dark dark */
+  0%   { color: #1a1008; text-shadow: none; }
+  /* BAP — hard flash */
+  3%   { color: #f5eedd; text-shadow: 0 0 28px rgba(245, 238, 220, 0.7); }
+  /* back to dark */
+  6%   { color: #1a1008; text-shadow: none; }
+  /* hold dark */
+  12%  { color: #1a1008; text-shadow: none; }
+  /* flicker — quick partial catch */
+  14%  { color: #c8a060; text-shadow: 0 0 12px rgba(200, 160, 96, 0.35); }
+  16%  { color: #1a1008; text-shadow: none; }
+  /* BAP — catches harder */
+  20%  { color: #f5eedd; text-shadow: 0 0 30px rgba(245, 238, 220, 0.75); }
+  /* drops but not to dark */
+  25%  { color: #6a4820; text-shadow: 0 0 4px rgba(106, 72, 32, 0.15); }
+  /* di di — quick stutters warming up */
+  30%  { color: #d8c090; text-shadow: 0 0 14px rgba(216, 192, 144, 0.4); }
+  33%  { color: #a07838; text-shadow: 0 0 8px rgba(160, 120, 56, 0.25); }
+  36%  { color: #e0d0a8; text-shadow: 0 0 16px rgba(224, 208, 168, 0.45); }
+  39%  { color: #c8b080; text-shadow: 0 0 10px rgba(200, 176, 128, 0.3); }
+  /* BAHHHHHH — full power, overdrives slightly then settles */
+  46%  { color: #fffff0; text-shadow: 0 0 35px rgba(255, 255, 240, 0.8); }
+  55%  { color: #f0f5e0; text-shadow: 0 0 20px rgba(240, 245, 224, 0.5); }
+  70%  { color: #e8edd5; text-shadow: 0 0 14px rgba(232, 237, 213, 0.4); }
+  100% { color: #e8edd5; text-shadow: 0 0 10px rgba(232, 237, 213, 0.35), 0 0 25px rgba(232, 237, 213, 0.18), 0 0 50px rgba(220, 230, 200, 0.08); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .icon-button {
   background: none;
   border: none;

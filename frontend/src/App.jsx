@@ -95,6 +95,7 @@ if (authLoading) {
           path="/"
           element={
             <HomePage
+              user={user}
               exercises={exercises}
               setExercises={setExercises}
               setExerciseDraft={setExerciseDraft}

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
 import { todayIsoLocal } from "../utils/date";
 
-function HomePage({ exercises, setExercises, setExerciseDraft }) {
+function HomePage({ user, exercises, setExercises, setExerciseDraft }) {
   const navigate = useNavigate();
   const today = todayIsoLocal();
 
@@ -34,6 +34,7 @@ function HomePage({ exercises, setExercises, setExerciseDraft }) {
   return (
     <div>
       <ExerciseTable
+        user={user}
         exercises={exercises}
         onDelete={onDelete}
         onEdit={onEdit}
