@@ -1,8 +1,8 @@
-# LiftLog – Exercise Tracker
+# SparkMvmt – Exercise Tracker
 
 Create, edit, review, and delete exercise logs.
 
-LiftLog is a full-stack MERN application featuring a responsive React frontend and a REST API backend built with Express, Mongoose, and MongoDB.
+SparkMvmt is a full-stack MERN application featuring a responsive React frontend and a REST API backend built with Express, Mongoose, and MongoDB.
 
 The app allows users to quickly log workouts, track exercise details, and manage their training history through a clean and responsive interface.
 
@@ -146,7 +146,7 @@ Many IDEs (such as VS Code with the REST Client extension) allow sending HTTP re
 
 # Design Decisions
 
-LiftLog was built with a focus on clarity, maintainability, and progressive improvement.
+SparkMvmt was built with a focus on clarity, maintainability, and progressive improvement.
 
 ## Stateless REST API
 The backend is a simple REST API built with Express and Mongoose. The API remains stateless and can be tested independently of the frontend.
@@ -184,11 +184,12 @@ The UI evolved significantly during development. Early versions focused on funct
 
 Planned improvements include:
 
-- Application deployment (likely Vercel + Railway)
-- User authentication (likely JWT)
+- Application deployment (AWS: EC2, ALB, Cloudfront, S3 - initiated)
+- User authentication (JWT, nearing completion)
 - Exercise name autocomplete
 - Grouping exercises by workouts
-
+- Notes field
+- Encryption of entries
 
 ---
 
