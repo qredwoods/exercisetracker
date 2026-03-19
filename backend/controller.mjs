@@ -1,11 +1,16 @@
 import express from "express";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 import * as model from "./model.mjs";
 import { User } from "./userModel.mjs";
 import { authRouter } from "./auth.mjs";
 import { requireAuth } from "./middleware.mjs";
 import "dotenv/config";
 import cors from "cors";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DIST = path.join(__dirname, "..", "frontend", "dist");
 
 const app = express();
 
@@ -257,6 +262,12 @@ app.delete("/api/exercises/:_id", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Server error." });
   }
+});
+
+// ── serve frontend build ─────────────────────────────────
+app.use(express.static(DIST));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(DIST, "index.html"));
 });
 
 const PORT = process.env.PORT || 5000;

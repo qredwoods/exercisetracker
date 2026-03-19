@@ -4,7 +4,8 @@
   "main": "controller.mjs",
   "scripts": {
     "test": "nodemon test",
-    "start": "nodemon controller.mjs"
+    "start": "nodemon controller.mjs",
+    "prod": "node controller.mjs"
   },
   "keywords": [],
   "author": "Q. Redwoods",
