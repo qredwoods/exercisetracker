@@ -19,12 +19,19 @@ function App() {
   const [exerciseDraft, setExerciseDraft] = useState(null);
   const [toast, setToast] = useState(null);
   const showToast = useCallback((message) => setToast(message), []);
-  const [isFirstVisit] = useState(() => {
+  const [isFirstVisit, setIsFirstVisit] = useState(() => {
     if (sessionStorage.getItem("welcomeSeen")) return false;
     sessionStorage.setItem("welcomeSeen", "1");
     return true;
   });
   const showWelcome = exercises.length === 0 && isFirstVisit && !exercisesLoading;
+
+  // Once exercises appear, welcome should never come back this session
+  useEffect(() => {
+    if (exercises.length > 0 && isFirstVisit) {
+      setIsFirstVisit(false);
+    }
+  }, [exercises.length, isFirstVisit]);
 
   // restore session from refresh cookie, then load exercises
   useEffect(() => {
