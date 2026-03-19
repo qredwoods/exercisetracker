@@ -67,31 +67,28 @@ if (authLoading) {
   );
 }
 
-  // not logged in — show login page
-  if (!user) {
-    return (
-      <>
-        <header>
-          <h1 className="site-title">SparkMvmt</h1>
-          <p>Movement. Workouts. Accountability.</p>
-        </header>
-        <LoginPage onAuth={handleAuth} />
-        <footer>©2026 Quinn Redwoods</footer>
-      </>
-    );
-  }
-
-  // logged in — normal app
   return (
     <>
       <header>
-          <h1>
+        <h1>
+          {user ? (
             <Link to="/" className="site-title">
               SparkMvmt
             </Link>
-          </h1>
-        <p> track exercises, energize your life</p>
+          ) : (
+            <span className="site-title">SparkMvmt</span>
+          )}
+        </h1>
+        <p>track exercises, energize your life</p>
       </header>
+
+      {!user ? (
+        <>
+          <LoginPage onAuth={handleAuth} />
+          <footer>©2026 Quinn Redwoods</footer>
+        </>
+      ) : (
+        <>
 
       <Routes>
         <Route
@@ -131,6 +128,7 @@ if (authLoading) {
       </Routes>
 
       <footer>
+          <p className="home-greeting">{user.firstName}'s log</p>
           <button className="signout-btn" onClick={handleLogout}>
             Sign out
           </button>
@@ -138,6 +136,8 @@ if (authLoading) {
         </footer>
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
+        </>
+      )}
     </>
   );
 }

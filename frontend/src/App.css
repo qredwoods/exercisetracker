@@ -11,6 +11,7 @@ body {
   margin: 1em;
   padding: 2em;
   text-align: center;
+  box-sizing: border-box;
 }
 
 button {
@@ -102,6 +103,29 @@ button:disabled {
     0 8px 18px rgba(0, 0, 0, 0.18);
 }
 
+.cta-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.back-btn:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 
 
 .site-title {
@@ -114,17 +138,17 @@ button:disabled {
     0 2px 4px #00000055;
 }
 
-.site-title:hover {
+a.site-title:hover {
   color:#747bff
 }
 
 
 table {
   width: min(1100px, 100%);
-  max-width: 92vw;
   margin: 1rem auto;
   margin-top: 2rem;
   padding: 20px;
+  box-sizing: border-box;
   border-collapse: separate;
   border-spacing: 0;
   background: rgba(255, 255, 255, 0.08);
@@ -292,6 +316,10 @@ input {
 
 footer {
   margin-top: 6em;
+}
+
+footer .signout-btn,
+footer .copyright {
   opacity: 0.7;
 }
 
@@ -305,7 +333,7 @@ footer {
 
 .exercise-form {
   width: min(1100px, 100%);
-  max-width: 92vw;
+  max-width: min(92vw, 100vw - 6em - 2rem);
   margin: 0 auto 1rem;
   padding: 20px;
   display: flex;
@@ -421,13 +449,72 @@ footer {
   background-color: #415c89;
 }
 
+.home-greeting {
+  font-size: 1.15rem;
+  font-family: 'Dancing Script', cursive;
+  color: #e8edd5;
+  text-shadow: 0 0 6px rgba(232, 237, 213, 0.15);
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.home-greeting:hover {
+  animation: greeting-glow 1.5s ease-out forwards;
+  opacity: 1;
+}
+
+@keyframes greeting-glow {
+  0%   { color: #e8edd5; text-shadow: 0 0 6px rgba(232, 237, 213, 0.15); font-size: 1.15rem; }
+  30%  { color: #f0f5e0; text-shadow: 0 0 14px rgba(240, 245, 224, 0.4); font-size: 1.25rem; }
+  55%  { color: #fffff0; text-shadow: 0 0 28px rgba(255, 255, 240, 0.7), 0 0 50px rgba(232, 237, 213, 0.3); font-size: 1.3rem; }
+  70%  { color: #e8edd5; text-shadow: 0 0 10px rgba(232, 237, 213, 0.35), 0 0 25px rgba(232, 237, 213, 0.18); font-size: 1.3rem; }
+  100% { color: #fffff0; text-shadow: 0 0 28px rgba(255, 255, 240, 0.7), 0 0 50px rgba(232, 237, 213, 0.3); font-size: 1.3rem; }
+}
+
+.heading-error-zone {
+  height: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 3.5rem;
+  margin-bottom: -0.8rem;
+}
+
+.heading-error-zone .form-heading {
+  transition: transform 0.3s ease;
+  transform: translateY(0);
+}
+
+.heading-error-zone.has-error .form-heading {
+  transform: translateY(-1.6rem);
+}
+
+.heading-error-zone.has-error .form-error {
+  transform: translateY(-0.4rem);
+}
+
+.heading-error-zone .form-error {
+  margin: 0;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+
+.heading-error-zone.fading .form-error {
+  opacity: 0;
+}
+
+.heading-error-zone.fading .form-heading {
+  transform: translateY(0);
+}
+
 .form-heading {
   font-size: 1.4rem;
   font-family: 'Dancing Script', cursive;
   color: #8a7058;
   text-shadow: none;
-  margin-top: 2rem;
-  margin-bottom: -0.8rem;
+  margin: 0;
   animation: heading-warm 1.2s 0.3s ease-out forwards;
 }
 
@@ -445,7 +532,7 @@ footer {
 .form-error {
   margin: 0 0 0.75rem 0;
   color: #ff9a9a;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   text-align: center;
 }
 
@@ -554,6 +641,49 @@ footer {
   .input-affix--suffix {
     right: 18px;
   }
+
+  table {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  tr th,
+  tr td {
+    padding: 0.3em 0.35em;
+  }
+
+  /* remove vertical borders between action icons, keep outer right */
+  tr td:nth-last-child(-n+3) {
+    border-left: none;
+    border-right: none;
+  }
+
+  tr td:last-child {
+    border-right: 1px solid rgba(186, 78, 66, 0.833);
+  }
+
+  .icon-button svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.table-scaler {
+  width: 100%;
+  overflow: visible;
+}
+
+@media (max-width: 480px) {
+  body {
+    margin: 0.25em;
+    padding: 0.5em;
+  }
+
+  .table-scaler {
+    transform: scale(0.93);
+    transform-origin: top center;
+    margin-bottom: -1rem;
+  }
 }
 
 /* AUTH */
@@ -580,7 +710,7 @@ footer {
 .auth-page {
   display: flex;
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: 2rem 0;
 }
 
 .auth-card {
@@ -589,10 +719,11 @@ footer {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 2.5rem 2rem;
+  padding: 2rem 1.5rem;
   width: 100%;
-  max-width: 400px;
+  max-width: min(400px, 100vw - 6em - 2rem);
   text-align: center;
+  box-sizing: border-box;
 }
 
 .auth-card h2 {
@@ -680,6 +811,11 @@ footer {
 
 .eye-toggle:hover {
   color: rgba(255, 255, 255, 0.7);
+}
+
+.eye-toggle:active {
+  transform: translateY(-50%);
+  box-shadow: none;
 }
 
 .auth-submit {

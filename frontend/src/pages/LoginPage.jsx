@@ -13,6 +13,7 @@ export default function LoginPage({ onAuth }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -135,6 +136,8 @@ export default function LoginPage({ onAuth }) {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
               autoComplete={isSignup ? "new-password" : "current-password"}
               maxLength={128}
             />
@@ -159,7 +162,7 @@ export default function LoginPage({ onAuth }) {
               )}
             </button>
           </div>
-          {isSignup && (
+          {isSignup && passwordFocused && (
             <ul className="password-rules">
               <li className={password.length >= 8 ? "rule-pass" : "rule-fail"}>
                 8+ characters

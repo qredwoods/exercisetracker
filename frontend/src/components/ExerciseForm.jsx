@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function todayIsoLocal() {
   const d = new Date();
@@ -14,6 +14,8 @@ const ExerciseForm = ({
   formId = "exercise-form",
   initialExercise = {},
   onSubmit,
+  onError,
+  onErrorClear,
 }) => {
   const [name, setName] = useState(initialExercise.name || "");
   const [reps, setReps] = useState(initialExercise.reps ?? "");
@@ -24,6 +26,12 @@ const ExerciseForm = ({
 
   const isBodyweight = unit === "bodyweight";
 
+  useEffect(() => {
+    if (formError && !validateForm()) {
+      onErrorClear?.();
+    }
+  }, [name, reps, weight, unit, date]);
+
   const validateForm = () => {
     if (!name.trim() || reps === "" || !unit || !date) {
       return "Please complete all required fields.";
@@ -33,14 +41,8 @@ const ExerciseForm = ({
       return "Reps must be greater than 0.";
     }
 
-    if (unit !== "bodyweight") {
-      if (weight === "") {
-        return "Please enter weight used or select unit: bodyweight.";
-      }
-
-      if (Number(weight) < 0) {
-        return "Weight cannot be negative.";
-      }
+    if (unit !== "bodyweight" && (!weight || Number(weight) <= 0)) {
+      return "Enter weight or select \"Bodyweight only.\"";
     }
 
     if (date > today) {
@@ -55,10 +57,12 @@ const ExerciseForm = ({
 
     if (validationError) {
       setFormError(validationError);
+      onError?.(validationError);
       return;
     }
 
     setFormError("");
+    onError?.("");
 
     const payload = {
       name: name.trim(),
@@ -73,12 +77,9 @@ const ExerciseForm = ({
 
   return (
     <div>
-      <p className="form-error" aria-live="polite">
-        {formError}
-      </p>
-
       <form
         autoComplete="new-password"
+        noValidate
         id={formId}
         className="exercise-form"
         onSubmit={(e) => {

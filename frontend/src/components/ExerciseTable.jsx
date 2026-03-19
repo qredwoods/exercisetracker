@@ -19,6 +19,7 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate}) => {
 
   return (
     <div>
+      <div className="table-scaler">
       <table>
         <thead>
           <tr>
@@ -44,6 +45,7 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate}) => {
         )}
         </tbody>
       </table>
+      </div>
       {isEmpty && (
         <div className="empty-hint">
           <p className={`welcome-line${animate ? "" : " no-animate"}`}>Welcome{user?.firstName ? `, ${user.firstName}` : ""}.</p>

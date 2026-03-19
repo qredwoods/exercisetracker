@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { FiArrowLeft } from "react-icons/fi";
 import { apiFetch } from "../utils/api";
 import ExerciseForm from "../components/ExerciseForm";
+import useFormError from "../utils/useFormError";
 
 const EditExercisePage = ({ exerciseDraft, setExercises, showToast }) => {
   const navigate = useNavigate();
+  const { formError, showError, clearError, zoneClass } = useFormError();
 
   const updateExercise = async (editedExercise) => {
     if (!exerciseDraft?._id) {
@@ -43,17 +46,25 @@ const EditExercisePage = ({ exerciseDraft, setExercises, showToast }) => {
 
   return (
     <div>
-      <p className="form-heading">Make a change</p>
+      <div className={zoneClass}>
+        <p className="form-heading">Make a change</p>
+        <p className="form-error" aria-live="polite">{formError}</p>
+      </div>
       <ExerciseForm
         formId="exercise-form"
         title=""
         initialExercise={exerciseDraft}
         onSubmit={updateExercise}
+        onError={showError}
+        onErrorClear={clearError}
       />
 
       <div className="cta-row">
         <button className="cta-button" type="submit" form="exercise-form">
           Update Exercise
+        </button>
+        <button className="back-btn" onClick={() => navigate("/")}>
+          <FiArrowLeft />
         </button>
       </div>
     </div>
