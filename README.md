@@ -25,11 +25,13 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
 ## Features
 
 - Log, edit, duplicate, and delete exercises
+- Exercise detail page with optional notes
+- Clickable table rows for quick access to details
 - Bodyweight exercise support
 - Responsive desktop and mobile layouts
 - Accessible form controls with keyboard navigation
 - Real-time form validation with toast feedback
-- Session restoration across page reloads
+- Session restoration across page reloads with loading states
 
 ## Technical Highlights
 
@@ -47,14 +49,14 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
 ```
 ├── frontend/
 │   └── src/
-│       ├── pages/          # LoginPage, HomePage, CreateExercise, EditExercise
+│       ├── pages/          # LoginPage, HomePage, CreateExercise, EditExercise, ExerciseDetail
 │       ├── components/     # ExerciseForm, ExerciseTable, ExerciseRow, Toast
-│       └── utils/          # API client (token refresh, auth headers), date helpers
+│       └── utils/          # API client (token refresh, auth headers), date helpers, useFormError hook
 ├── backend/
 │   ├── controller.mjs      # Express app, exercise CRUD routes
 │   ├── auth.mjs            # Signup, login, refresh, logout
 │   ├── middleware.mjs       # Auth middleware (token verification)
-│   ├── model.mjs           # Exercise schema
+│   ├── model.mjs           # Exercise schema (name, reps, weight, unit, date, notes)
 │   └── userModel.mjs       # User schema
 ```
 

@@ -24,7 +24,7 @@ function App() {
     sessionStorage.setItem("welcomeSeen", "1");
     return true;
   });
-  const showWelcome = exercises.length === 0 && isFirstVisit;
+  const showWelcome = exercises.length === 0 && isFirstVisit && !exercisesLoading;
 
   // restore session from refresh cookie, then load exercises
   useEffect(() => {
@@ -157,7 +157,7 @@ if (authLoading) {
       </Routes>
 
       <footer>
-          {!showWelcome && <p className="home-greeting">{user.firstName}'s log</p>}
+          {!showWelcome && <p className="home-greeting">{`${user.firstName}'s log`}</p>}
           <button className="signout-btn" onClick={handleLogout}>
             Sign out
           </button>
