@@ -1,7 +1,6 @@
 import "./App.css";
 import HomePage from "./pages/HomePage";
-import EditExercisePage from "./pages/EditExercisePage";
-import CreateExercisePage from "./pages/CreateExercisePage";
+import ExerciseFormPage from "./pages/ExerciseFormPage";
 import ExerciseDetailPage from "./pages/ExerciseDetailPage";
 import LoginPage from "./pages/LoginPage";
 
@@ -131,7 +130,7 @@ if (authLoading) {
         <Route
           path="/create"
           element={
-            <CreateExercisePage
+            <ExerciseFormPage
               setExercises={setExercises}
               exerciseDraft={exerciseDraft}
               setExerciseDraft={setExerciseDraft}
@@ -142,9 +141,10 @@ if (authLoading) {
         <Route
           path="/edit"
           element={
-            <EditExercisePage
-              exerciseDraft={exerciseDraft}
+            <ExerciseFormPage
               setExercises={setExercises}
+              exerciseDraft={exerciseDraft}
+              setExerciseDraft={setExerciseDraft}
               showToast={showToast}
             />
           }

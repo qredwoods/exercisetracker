@@ -2,7 +2,10 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import validator from 'validator';
-import { createUser, findUserByEmail, verifyPassword } from './userModel.mjs';
+import crypto from 'crypto';
+import { User, createUser, findUserByEmail, verifyPassword } from './userModel.mjs';
+import { Exercise } from './model.mjs';
+import { generateDemoExercises } from './demoSeed.mjs';
 
 const router = express.Router();
 
@@ -167,6 +170,33 @@ router.post('/refresh', async (req, res) => {
   } catch (err) {
     // expired or tampered
     return res.status(401).json({ error: 'Invalid refresh token.' });
+  }
+});
+
+// ── demo ───────────────────────────────────────────────
+router.post('/demo', authLimiter, async (req, res) => {
+  try {
+    const id = crypto.randomUUID().slice(0, 8);
+    const email = `demo_${id}@sparkmvmt.com`;
+    const password = `Demo!${crypto.randomUUID()}`;
+    const demoExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    const user = await createUser('Demo', 'User', email, password);
+    user.isDemo = true;
+    user.demoExpiresAt = demoExpiresAt;
+    await user.save();
+
+    const exercises = generateDemoExercises(user._id, demoExpiresAt);
+    await Exercise.insertMany(exercises);
+
+    const accessToken = signAccessToken(user._id);
+    const refreshToken = signRefreshToken(user._id);
+    setRefreshCookie(res, refreshToken);
+
+    res.status(201).json({ user, accessToken });
+  } catch (err) {
+    console.error('Demo error:', err);
+    res.status(500).json({ error: 'Could not create demo account.' });
   }
 });
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { login, signup } from "../utils/api";
+import { login, signup, startDemo } from "../utils/api";
 
 export default function LoginPage({ onAuth }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -14,6 +14,7 @@ export default function LoginPage({ onAuth }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,8 +89,28 @@ export default function LoginPage({ onAuth }) {
     setAgeConfirmed(false);
   };
 
+  const handleDemo = async () => {
+    setDemoLoading(true);
+    setError("");
+    try {
+      const user = await startDemo();
+      onAuth(user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDemoLoading(false);
+    }
+  };
+
   return (
     <main className="auth-page">
+      <button
+        className="demo-btn"
+        onClick={handleDemo}
+        disabled={demoLoading || loading}
+      >
+        {demoLoading ? "Setting up demo..." : "Try the demo"}
+      </button>
       <div className="auth-card">
         <h2>{isSignup ? "Create Account" : "Welcome"}</h2>
         <p className="auth-subtitle">

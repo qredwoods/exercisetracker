@@ -73,6 +73,11 @@ const exerciseSchema = mongoose.Schema({
     required: true,
     index: true,
   },
+  demoExpiresAt: {
+    type: Date,
+    sparse: true,
+    index: { expires: 0 },
+  },
 });
 
 // exercise class
@@ -111,4 +116,4 @@ const deleteById = async (_id, userId) => {
   return result.deletedCount;
 }
 
-export {connect, createExercise, deleteExercises, findExercises, deleteById, findExerciseById, updateExercise}
+export {connect, Exercise, createExercise, deleteExercises, findExercises, deleteById, findExerciseById, updateExercise}

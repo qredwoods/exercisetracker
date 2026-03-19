@@ -115,6 +115,93 @@ button:disabled {
   gap: 0.8rem;
 }
 
+.cta-row-fixed {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.dual-btn {
+  display: flex;
+  justify-content: space-around;
+  width: min(400px, 80vw);
+}
+
+.dual-btn .cta-button[data-tooltip] {
+  position: relative;
+}
+
+.dual-btn .cta-button[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #e0e0e0;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.35em 0.7em;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease 0.4s;
+}
+
+.dual-btn .cta-button[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+.dual-btn .back-btn {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.3rem;
+  aspect-ratio: 1;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6em;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease;
+}
+
+.dual-btn .back-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34);
+}
+
+.dual-btn .cta-button {
+  font-size: 1em;
+  padding: 0.6em 1.2em;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dual-btn .cta-button:not(.cta-button--icon) {
+  min-width: 100px;
+}
+
+.dual-btn .cta-button--icon {
+  font-size: 1.3rem;
+  aspect-ratio: 1;
+  padding: 0.6em;
+  min-height: 52px;
+}
+
 .back-btn {
   background: none;
   border: none;
@@ -511,6 +598,10 @@ footer .copyright {
   cursor: pointer;
 }
 
+.date-numeric {
+  display: none;
+}
+
 .clickable-row:hover td {
   background: rgba(255, 255, 255, 0.07);
 }
@@ -817,6 +908,21 @@ footer .copyright {
   animation: fade-in 0.6s ease-in;
 }
 
+@media (max-width: 530px) {
+  .date-year {
+    display: none;
+  }
+}
+
+@media (max-width: 446px) {
+  .date-month-day {
+    display: none;
+  }
+  .date-numeric {
+    display: inline;
+  }
+}
+
 @media (max-width: 480px) {
   body {
     margin: 0.25em;
@@ -865,8 +971,33 @@ footer .copyright {
 /* auth page */
 .auth-page {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   padding: 2rem 0;
+  gap: 1.2rem;
+}
+
+.demo-btn {
+  padding: 0.65rem 1.6rem;
+  border-radius: 8px;
+  border: 1px solid rgba(144, 238, 144, 0.25);
+  background: transparent;
+  color: #90ee90;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.demo-btn:hover:not(:disabled) {
+  background: rgba(144, 238, 144, 0.1);
+  border-color: rgba(144, 238, 144, 0.45);
+}
+
+.demo-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .auth-card {
@@ -1126,6 +1257,77 @@ footer .copyright {
   cursor: pointer;
   animation: toast-in 0.3s ease-out;
   z-index: 1000;
+}
+
+/* discard overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fade-in 0.2s ease-out;
+}
+
+.overlay-card {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 1.8rem 2rem;
+  text-align: center;
+  max-width: 320px;
+  width: 90vw;
+}
+
+.overlay-card p {
+  color: #e0e0e0;
+  font-size: 1rem;
+  margin: 0 0 1.4rem 0;
+}
+
+.overlay-highlight {
+  color: rgb(160, 219, 160);
+}
+
+.overlay-actions {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.overlay-btn {
+  padding: 0.55rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.overlay-btn--cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.overlay-btn--cancel:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.overlay-btn--confirm {
+  background: rgba(255, 80, 80, 0.15);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  color: #ff8a8a;
+}
+
+.overlay-btn--confirm:hover {
+  background: rgba(255, 80, 80, 0.25);
 }
 
 @keyframes toast-in {

@@ -1,0 +1,11 @@
+{
+  "name": "exercisetracker",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n be,fe -c blue,green \"npm start --prefix backend\" \"npm run dev --prefix frontend\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { FiArrowLeft, FiEdit3, FiCopy } from "react-icons/fi";
 import { TiDeleteOutline } from "react-icons/ti";
 import { formatDisplayDate } from "../components/ExerciseRow";
 import { todayIsoLocal } from "../utils/date";
 import { apiFetch } from "../utils/api";
+import ConfirmOverlay from "../components/ConfirmOverlay";
 
 const ExerciseDetailPage = ({ exerciseDraft, setExerciseDraft, setExercises, showToast }) => {
   const navigate = useNavigate();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const exercise = exerciseDraft;
 
   if (!exercise?._id) {
@@ -83,7 +86,7 @@ const ExerciseDetailPage = ({ exerciseDraft, setExerciseDraft, setExercises, sho
           <button className="icon-button" aria-label="Duplicate" onClick={onDuplicate}>
             <FiCopy />
           </button>
-          <button className="icon-button" aria-label="Delete" onClick={onDelete}>
+          <button className="icon-button" aria-label="Delete" onClick={() => setShowDeleteConfirm(true)}>
             <TiDeleteOutline />
           </button>
         </div>
@@ -94,6 +97,16 @@ const ExerciseDetailPage = ({ exerciseDraft, setExerciseDraft, setExercises, sho
           <FiArrowLeft />
         </button>
       </div>
+
+      {showDeleteConfirm && (
+        <ConfirmOverlay
+          message={<>Delete this entry? <span className="overlay-highlight">{name}, {formatDisplayDate(date)}</span></>}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          onConfirm={onDelete}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
     </div>
   );
 };

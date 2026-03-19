@@ -16,6 +16,8 @@ const ExerciseForm = ({
   onSubmit,
   onError,
   onErrorClear,
+  resetRef,
+  dirtyRef,
 }) => {
   const [name, setName] = useState(initialExercise.name || "");
   const [reps, setReps] = useState(initialExercise.reps ?? "");
@@ -23,6 +25,34 @@ const ExerciseForm = ({
   const [unit, setUnit] = useState(initialExercise.unit || "lbs");
   const [date, setDate] = useState(initialExercise.date || today);
   const [notes, setNotes] = useState(initialExercise.notes || "");
+
+  if (resetRef) {
+    resetRef.current = () => {
+      setName("");
+      setReps("");
+      setWeight("");
+      setUnit("lbs");
+      setDate(today);
+      setNotes("");
+    };
+  }
+
+  if (dirtyRef) {
+    dirtyRef.current = () => {
+      const init = initialExercise;
+      if (init._id) {
+        // edit/duplicate: dirty if anything changed from initial
+        return name !== (init.name || "") ||
+          reps !== (init.reps ?? "") ||
+          weight !== (init.weight ?? "") ||
+          unit !== (init.unit || "lbs") ||
+          date !== (init.date || today) ||
+          notes !== (init.notes || "");
+      }
+      // create: dirty if any field has content
+      return name.trim() !== "" || reps !== "" || weight !== "" || notes.trim() !== "";
+    };
+  }
   const [formError, setFormError] = useState("");
 
   const isBodyweight = unit === "bodyweight";

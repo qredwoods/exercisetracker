@@ -10,11 +10,18 @@ function formatDisplayDate(dateString) {
     Number(day)
   );
 
-  return date.toLocaleDateString("en-US", {
+  const monthDay = date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
-    year: "numeric",
   });
+  const yearStr = date.toLocaleDateString("en-US", { year: "numeric" });
+  const numeric = `${Number(month)}/${day}`;
+
+  return <>
+    <span className="date-month-day">{monthDay}</span>
+    <span className="date-numeric">{numeric}</span>
+    <span className="date-year">, {yearStr}</span>
+  </>;
 }
 
 const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView }) => {

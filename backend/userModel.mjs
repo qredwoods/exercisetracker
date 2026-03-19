@@ -31,6 +31,15 @@ const userSchema = mongoose.Schema({
     type: Date,
     required: true,
   },
+  isDemo: {
+    type: Boolean,
+    default: false,
+  },
+  demoExpiresAt: {
+    type: Date,
+    sparse: true,
+    index: { expires: 0 },
+  },
 }, { timestamps: true });
 
 // never return passwordHash in JSON

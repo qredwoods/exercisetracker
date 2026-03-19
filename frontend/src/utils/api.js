@@ -101,6 +101,12 @@ export async function signup(firstName, lastName, email, password, ageConfirmed)
   return data.user;
 }
 
+export async function startDemo() {
+  const data = await apiFetch("/api/auth/demo", { method: "POST" });
+  setAccessToken(data.accessToken);
+  return data.user;
+}
+
 export async function logout() {
   try {
     await apiFetch("/api/auth/logout", { method: "POST" });
