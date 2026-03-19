@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import ExerciseRow, { formatDisplayDate } from './ExerciseRow'
 
 const EXAMPLE_ROW = {
@@ -9,17 +8,13 @@ const EXAMPLE_ROW = {
   date: new Date().toISOString().slice(0, 10),
 };
 
-const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate}) => {
+const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, isFirstVisit, fadeIn, onFadeComplete}) => {
   const isEmpty = exercises.length === 0;
-  const [animate] = useState(() => {
-    if (sessionStorage.getItem("welcomeSeen")) return false;
-    sessionStorage.setItem("welcomeSeen", "1");
-    return true;
-  });
+  const showWelcome = isEmpty && isFirstVisit;
 
   return (
     <div>
-      <div className="table-scaler">
+      <div className={`table-scaler${fadeIn ? " fade-in" : ""}`} onAnimationEnd={onFadeComplete}>
       <table>
         <thead>
           <tr>
@@ -46,11 +41,16 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate}) => {
         </tbody>
       </table>
       </div>
-      {isEmpty && (
-        <div className="empty-hint">
-          <p className={`welcome-line${animate ? "" : " no-animate"}`}>Welcome{user?.firstName ? `, ${user.firstName}` : ""}.</p>
-          <p>This is your <span className={`underline-reveal${animate ? "" : " no-animate"}`}>exercise log</span> — everything you track shows up here.</p>
+      {showWelcome && (
+        <div className="empty-hint" style={{ marginTop: "2rem" }}>
+          <p className="welcome-line">Welcome{user?.firstName ? `, ${user.firstName}` : ""}.</p>
+          <p>This is your <span className="underline-reveal">exercise log</span> — everything you track shows up here.</p>
           <p>Let's get started!</p>
+        </div>
+      )}
+      {isEmpty && !showWelcome && (
+        <div className="empty-hint">
+          <p>Nothing here yet — log something to get started!</p>
         </div>
       )}
     </div>

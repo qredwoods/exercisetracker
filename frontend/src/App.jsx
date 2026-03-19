@@ -13,9 +13,17 @@ function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [exercises, setExercises] = useState([]);
+  const [exercisesLoading, setExercisesLoading] = useState(false);
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
   const [exerciseDraft, setExerciseDraft] = useState(null);
   const [toast, setToast] = useState(null);
   const showToast = useCallback((message) => setToast(message), []);
+  const [isFirstVisit] = useState(() => {
+    if (sessionStorage.getItem("welcomeSeen")) return false;
+    sessionStorage.setItem("welcomeSeen", "1");
+    return true;
+  });
+  const showWelcome = exercises.length === 0 && isFirstVisit;
 
   // restore session from refresh cookie, then load exercises
   useEffect(() => {
@@ -23,6 +31,7 @@ function App() {
       .then(async (user) => {
         if (user) {
           setUser(user);
+          setJustLoggedIn(true);
           await loadExercises();
         }
       })
@@ -30,20 +39,24 @@ function App() {
   }, []);
 
   const loadExercises = async () => {
+    setExercisesLoading(true);
     try {
       const data = await apiFetch("/api/exercises");
       setExercises(data);
     } catch (err) {
       console.error("Failed to load exercises:", err);
-      // if auth expired, kick to login
       if (err.status === 401) {
         setUser(null);
       }
+    } finally {
+      setExercisesLoading(false);
     }
   };
 
-  const handleAuth = (userData) => {
+  const handleAuth = async (userData) => {
     setUser(userData);
+    setJustLoggedIn(true);
+    await loadExercises();
   };
 
   const navigate = useNavigate();
@@ -97,9 +110,13 @@ if (authLoading) {
             <HomePage
               user={user}
               exercises={exercises}
+              exercisesLoading={exercisesLoading}
               setExercises={setExercises}
               setExerciseDraft={setExerciseDraft}
               showToast={showToast}
+              isFirstVisit={isFirstVisit}
+              justLoggedIn={justLoggedIn}
+              onFadeComplete={() => setJustLoggedIn(false)}
             />
           }
         />
@@ -128,7 +145,7 @@ if (authLoading) {
       </Routes>
 
       <footer>
-          <p className="home-greeting">{user.firstName}'s log</p>
+          {!showWelcome && <p className="home-greeting">{user.firstName}'s log</p>}
           <button className="signout-btn" onClick={handleLogout}>
             Sign out
           </button>

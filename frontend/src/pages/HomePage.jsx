@@ -4,7 +4,7 @@ import { flushSync } from "react-dom";
 import { apiFetch } from "../utils/api";
 import { todayIsoLocal } from "../utils/date";
 
-function HomePage({ user, exercises, setExercises, setExerciseDraft, showToast }) {
+function HomePage({ user, exercises, exercisesLoading, setExercises, setExerciseDraft, showToast, isFirstVisit, justLoggedIn, onFadeComplete }) {
   const navigate = useNavigate();
   const today = todayIsoLocal();
 
@@ -32,6 +32,14 @@ function HomePage({ user, exercises, setExercises, setExerciseDraft, showToast }
 };
 
 
+  if (exercisesLoading) {
+    return (
+      <div className="exercises-loading">
+        <div className="auth-spinner" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <ExerciseTable
@@ -40,6 +48,9 @@ function HomePage({ user, exercises, setExercises, setExerciseDraft, showToast }
         onDelete={onDelete}
         onEdit={onEdit}
         onDuplicate={onDuplicate}
+        isFirstVisit={isFirstVisit}
+        fadeIn={justLoggedIn}
+        onFadeComplete={onFadeComplete}
       />
 
       <div className="cta-row">

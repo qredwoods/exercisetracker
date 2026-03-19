@@ -432,6 +432,15 @@ footer .copyright {
   color: #64748b;
 }
 
+.exercise-form input:-webkit-autofill,
+.exercise-form input:-webkit-autofill:hover,
+.exercise-form input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(20, 58, 144, 0.85) inset;
+  -webkit-text-fill-color: rgb(160, 219, 160);
+  caret-color: rgb(160, 219, 160);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .exercise-form input:hover,
 .exercise-form select:hover {
   background-color: #5f7eb3;
@@ -678,6 +687,10 @@ footer .copyright {
   overflow: visible;
 }
 
+.table-scaler.fade-in {
+  animation: fade-in 0.6s ease-in;
+}
+
 @media (max-width: 480px) {
   body {
     margin: 0.25em;
@@ -786,6 +799,15 @@ footer .copyright {
 
 .auth-form input::placeholder {
   color: rgba(255, 255, 255, 0.35);
+}
+
+.auth-form input:-webkit-autofill,
+.auth-form input:-webkit-autofill:hover,
+.auth-form input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.97) inset;
+  -webkit-text-fill-color: #e0e0e0;
+  caret-color: #e0e0e0;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .auth-form input:focus {
@@ -929,6 +951,12 @@ footer .copyright {
 
 .auth-toggle-btn:hover {
   color: #b0ffb0;
+}
+
+.exercises-loading {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
 }
 
 /* loading spinner for session restore */
