@@ -1,5 +1,6 @@
 import ExerciseTable from "../components/ExerciseTable";
 import { useNavigate } from "react-router-dom";
+import { flushSync } from "react-dom";
 import { apiFetch } from "../utils/api";
 import { todayIsoLocal } from "../utils/date";
 
@@ -42,7 +43,7 @@ function HomePage({ user, exercises, setExercises, setExerciseDraft, showToast }
       />
 
       <div className="cta-row">
-        <button className="cta-button" onClick={() => { setExerciseDraft(null); navigate("/create"); }}>
+        <button className="cta-button" onClick={() => { flushSync(() => setExerciseDraft(null)); navigate("/create"); }}>
           Log Exercise
         </button>
       </div>

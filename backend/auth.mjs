@@ -8,7 +8,7 @@ const router = express.Router();
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 7,                    // 7 attempts per window
+  max: process.env.NODE_ENV === 'production' ? 7 : 500,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many attempts. Please try again later.' },
