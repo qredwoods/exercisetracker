@@ -17,12 +17,12 @@ function formatDisplayDate(dateString) {
   });
 }
 
-const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate }) => {
+const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView }) => {
   const { name, reps, weight, unit, date, _id } = exercise;
   const isBodyweight = unit === "bodyweight";
 
   return (
-    <tr>
+    <tr className="clickable-row" onClick={() => onView(exercise)}>
       <td>{name}</td>
       <td>{reps}</td>
       <td>{isBodyweight ? "BW" : `${weight} ${unit}`}</td>
@@ -33,7 +33,7 @@ const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate }) => {
           type="button"
           className="icon-button"
           aria-label={`Edit ${name}`}
-          onClick={() => onEdit(exercise)}
+          onClick={(e) => { e.stopPropagation(); onEdit(exercise); }}
         >
           <FiEdit3 />
         </button>
@@ -44,7 +44,7 @@ const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate }) => {
           type="button"
           className="icon-button"
           aria-label={`Duplicate ${name}`}
-          onClick={() => onDuplicate(exercise)}
+          onClick={(e) => { e.stopPropagation(); onDuplicate(exercise); }}
         >
           <FiCopy />
         </button>
@@ -55,7 +55,7 @@ const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate }) => {
           type="button"
           className="icon-button"
           aria-label={`Delete ${name}`}
-          onClick={() => onDelete(_id)}
+          onClick={(e) => { e.stopPropagation(); onDelete(_id); }}
         >
           <TiDeleteOutline />
         </button>

@@ -77,12 +77,15 @@ function isDateValid(date) {
 }
 
 function validateExerciseBody(body) {
-  const allowedFields = ["name", "reps", "weight", "unit", "date"].sort();
-  const requestFields = Object.keys(body).sort();
-  const fieldsMatch =
-    JSON.stringify(allowedFields) === JSON.stringify(requestFields);
+  const requiredFields = ["name", "reps", "weight", "unit", "date"];
+  const optionalFields = ["notes"];
+  const allAllowed = [...requiredFields, ...optionalFields];
+  const requestFields = Object.keys(body);
 
-  if (!fieldsMatch) {
+  const hasAllRequired = requiredFields.every((f) => requestFields.includes(f));
+  const allFieldsAllowed = requestFields.every((f) => allAllowed.includes(f));
+
+  if (!hasAllRequired || !allFieldsAllowed) {
     return {
       valid: false,
       error: "Please complete all required fields.",
@@ -135,6 +138,8 @@ function validateExerciseBody(body) {
     };
   }
 
+  const notes = typeof body.notes === "string" ? body.notes.trim() : "";
+
   return {
     valid: true,
     data: {
@@ -143,6 +148,7 @@ function validateExerciseBody(body) {
       weight,
       unit,
       date,
+      notes,
     },
   };
 }

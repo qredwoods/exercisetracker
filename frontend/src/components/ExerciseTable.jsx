@@ -8,7 +8,7 @@ const EXAMPLE_ROW = {
   date: new Date().toISOString().slice(0, 10),
 };
 
-const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, isFirstVisit, fadeIn, onFadeComplete}) => {
+const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, isFirstVisit, fadeIn, onFadeComplete}) => {
   const isEmpty = exercises.length === 0;
   const showWelcome = isEmpty && isFirstVisit;
 
@@ -36,7 +36,7 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, isFirstV
           </tr>
         ) : (
           exercises.map((exercise) =>
-            <ExerciseRow exercise={exercise} key={exercise._id} onDelete={onDelete} onEdit={onEdit} onDuplicate={onDuplicate}/>)
+            <ExerciseRow exercise={exercise} key={exercise._id} onDelete={onDelete} onEdit={onEdit} onDuplicate={onDuplicate} onView={onView}/>)
         )}
         </tbody>
       </table>

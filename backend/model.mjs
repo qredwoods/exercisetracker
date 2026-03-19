@@ -62,6 +62,11 @@ const exerciseSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  notes: {
+    type: String,
+    trim: true,
+    default: "",
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -73,9 +78,9 @@ const exerciseSchema = mongoose.Schema({
 // exercise class
 const Exercise = mongoose.model("Exercise", exerciseSchema); 
 
-const createExercise = async (body) => { 
-  const {name, reps, weight, unit, date, userId} = body;
-  const exercise = new Exercise({name, reps, weight, unit, date, userId}); 
+const createExercise = async (body) => {
+  const {name, reps, weight, unit, date, notes, userId} = body;
+  const exercise = new Exercise({name, reps, weight, unit, date, notes, userId});
   return exercise.save();
 }
 

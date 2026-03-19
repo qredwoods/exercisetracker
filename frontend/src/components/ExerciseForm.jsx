@@ -22,6 +22,7 @@ const ExerciseForm = ({
   const [weight, setWeight] = useState(initialExercise.weight ?? "");
   const [unit, setUnit] = useState(initialExercise.unit || "lbs");
   const [date, setDate] = useState(initialExercise.date || today);
+  const [notes, setNotes] = useState(initialExercise.notes || "");
   const [formError, setFormError] = useState("");
 
   const isBodyweight = unit === "bodyweight";
@@ -70,6 +71,7 @@ const ExerciseForm = ({
       weight: isBodyweight ? 0 : Number(weight),
       unit,
       date,
+      notes: notes.trim(),
     };
 
     await onSubmit(payload);
@@ -156,6 +158,15 @@ const ExerciseForm = ({
             value={date}
             onChange={(e) => setDate(e.target.value)}
             aria-invalid={!!formError && !date}
+          />
+        </div>
+        <div className="form-field notes-form-field">
+          <textarea
+            className="notes-input"
+            placeholder="Notes (optional)"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={2}
           />
         </div>
       </form>

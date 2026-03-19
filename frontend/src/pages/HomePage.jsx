@@ -23,13 +23,18 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
   };
 
   const onDuplicate = (exercise) => {
-  setExerciseDraft({
-    ...exercise,
-    _id: undefined,
-    date: today,
-  });
-  navigate("/create");
-};
+    setExerciseDraft({
+      ...exercise,
+      _id: undefined,
+      date: today,
+    });
+    navigate("/create");
+  };
+
+  const onView = (exercise) => {
+    setExerciseDraft(exercise);
+    navigate(`/exercise/${exercise._id}`);
+  };
 
 
   if (exercisesLoading) {
@@ -48,6 +53,7 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
         onDelete={onDelete}
         onEdit={onEdit}
         onDuplicate={onDuplicate}
+        onView={onView}
         isFirstVisit={isFirstVisit}
         fadeIn={justLoggedIn}
         onFadeComplete={onFadeComplete}

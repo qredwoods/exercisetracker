@@ -343,10 +343,10 @@ footer .copyright {
   padding: 20px;
   display: flex;
   align-items: flex-end;
+  flex-wrap: wrap;
   gap: 0;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 18px;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
@@ -419,13 +419,11 @@ footer .copyright {
 .exercise-form .form-field:first-child input,
 .exercise-form .form-field:first-child select {
   border-top-left-radius: 18px;
-  border-bottom-left-radius: 18px;
 }
 
-.exercise-form .form-field:last-child input,
-.exercise-form .form-field:last-child select {
+.exercise-form .date-field input {
   border-top-right-radius: 18px;
-  border-bottom-right-radius: 18px;
+  border-right: 1px solid rgba(186, 78, 66, 0.833);
 }
 
 .exercise-form input::placeholder {
@@ -461,6 +459,134 @@ footer .copyright {
   opacity: 0.75;
   cursor: not-allowed;
   background-color: #415c89;
+}
+
+
+
+.notes-form-field {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.notes-input {
+  width: 100%;
+  text-align: left;
+  border-radius: 0 0 18px 18px;
+  min-height: 48px;
+  padding: .7rem;
+  font-family: inherit;
+  font-size: 1rem;
+  color: inherit;
+  background-color: inherit;
+  border: 1px solid rgba(186, 78, 66, 0.833);
+  border-radius: 0 0 18px 18px;
+  outline: none;
+  resize: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.notes-input:hover {
+  background-color: #5f7eb3;
+}
+
+.notes-input:focus {
+  position: relative;
+  z-index: 1;
+  background-color: rgba(8, 8, 8, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #b7e4a8;
+  box-shadow: 0 0 0 1px rgba(163, 230, 53, 0.18);
+}
+
+.notes-input::placeholder {
+  color: #64748b;
+  text-align: center;
+}
+
+/* clickable rows */
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover td {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* detail page */
+.detail-page {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.detail-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: left;
+}
+
+.detail-name {
+  font-size: 1.4rem;
+  color: rgb(160, 219, 160);
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+.detail-fields {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detail-value {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+}
+
+.detail-notes {
+  margin-bottom: 1.5rem;
+}
+
+.detail-notes-text {
+  margin: 0.4rem 0 0;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.detail-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.detail-actions .icon-button svg {
+  width: 20px;
+  height: 20px;
 }
 
 .home-greeting {
@@ -577,6 +703,7 @@ footer .copyright {
     max-width: 88vw;
     padding: 20px 16px;
     margin: 1rem auto;
+    border-radius: 18px;
   }
 
   .name-field,
@@ -614,11 +741,6 @@ footer .copyright {
     border-bottom: none;
   }
 
-  .exercise-form .form-field:last-child input,
-  .exercise-form .form-field:last-child select {
-    border-bottom: 1px solid rgba(186, 78, 66, 0.833);
-  }
-
   .exercise-form .form-field:first-child input,
   .exercise-form .form-field:first-child select {
     border-top-left-radius: 18px;
@@ -627,13 +749,17 @@ footer .copyright {
     border-bottom-right-radius: 0;
   }
 
-  .exercise-form .form-field:last-child input,
-  .exercise-form .form-field:last-child select {
-    border-bottom-left-radius: 18px;
-    border-bottom-right-radius: 18px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+  .exercise-form .date-field input {
+    border-radius: 0;
+    border-right: 1px solid rgba(186, 78, 66, 0.833);
   }
+
+  .notes-input {
+    width: min(100%, 300px);
+    max-width: 300px;
+    min-width: 0;
+  }
+  
 
     .prefix-shell input,
   .suffix-shell input {

@@ -2,6 +2,7 @@ import "./App.css";
 import HomePage from "./pages/HomePage";
 import EditExercisePage from "./pages/EditExercisePage";
 import CreateExercisePage from "./pages/CreateExercisePage";
+import ExerciseDetailPage from "./pages/ExerciseDetailPage";
 import LoginPage from "./pages/LoginPage";
 
 import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
@@ -136,6 +137,17 @@ if (authLoading) {
           element={
             <EditExercisePage
               exerciseDraft={exerciseDraft}
+              setExercises={setExercises}
+              showToast={showToast}
+            />
+          }
+        />
+        <Route
+          path="/exercise/:id"
+          element={
+            <ExerciseDetailPage
+              exerciseDraft={exerciseDraft}
+              setExerciseDraft={setExerciseDraft}
               setExercises={setExercises}
               showToast={showToast}
             />
