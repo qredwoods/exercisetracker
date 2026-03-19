@@ -17,18 +17,16 @@ function App() {
   const [toast, setToast] = useState(null);
   const showToast = useCallback((message) => setToast(message), []);
 
-  // try to restore session from refresh cookie on mount
+  // restore session from refresh cookie, then load exercises
   useEffect(() => {
     tryRestoreSession()
-      .then((user) => {
-        if (user) setUser(user);
+      .then(async (user) => {
+        if (user) {
+          setUser(user);
+          await loadExercises();
+        }
       })
       .finally(() => setAuthLoading(false));
-  }, [])
-
-  // load exercises once authenticated
-  useEffect(() => {
-    loadExercises();
   }, []);
 
   const loadExercises = async () => {
