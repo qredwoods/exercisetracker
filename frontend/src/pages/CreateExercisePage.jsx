@@ -3,7 +3,7 @@ import { useState } from "react";
 import { apiFetch } from "../utils/api";
 import ExerciseForm from "../components/ExerciseForm";
 
-const CreateExercisePage = ({ setExercises, exerciseDraft, showToast }) => {
+const CreateExercisePage = ({ setExercises, exerciseDraft, setExerciseDraft, showToast }) => {
   const navigate = useNavigate();
   const [animate] = useState(() => {
     if (sessionStorage.getItem("headingSeen")) return false;
@@ -19,6 +19,7 @@ const CreateExercisePage = ({ setExercises, exerciseDraft, showToast }) => {
       });
 
       setExercises((prev) => [...prev, createdExercise]);
+      setExerciseDraft(null);
       navigate("/");
     } catch (err) {
       showToast(err.message);

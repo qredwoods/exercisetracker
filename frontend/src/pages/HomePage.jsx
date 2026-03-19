@@ -42,7 +42,7 @@ function HomePage({ user, exercises, setExercises, setExerciseDraft, showToast }
       />
 
       <div className="cta-row">
-        <button className="cta-button" onClick={() => navigate("/create")}>
+        <button className="cta-button" onClick={() => { setExerciseDraft(null); navigate("/create"); }}>
           Log Exercise
         </button>
       </div>
