@@ -1,5 +1,7 @@
 # SparkMvmt
 
+**[Live Demo →](https://sparkmvmt.com)**
+
 Full-stack exercise tracker with JWT token rotation, httpOnly cookie auth, and Argon2 password hashing.
 
 Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, and delete workouts through a responsive single-page UI.
@@ -27,6 +29,7 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
 - Responsive desktop and mobile layouts
 - Accessible form controls with keyboard navigation
 - Real-time form validation with toast feedback
+- Session restoration across page reloads
 
 ## Technical Highlights
 
@@ -35,6 +38,7 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
 - Silent token refresh on 401 and session restoration on page load
 - Object-level authorization — all exercise queries scoped to the authenticated user
 - RESTful API with protected routes and middleware auth
+- Production deployment on EC2 with Nginx and HTTPS via Certbot
 
 ---
 
@@ -102,7 +106,8 @@ Button elements for all actions, `aria-label` on icon buttons, preserved focus s
 
 ## Roadmap
 
-- AWS deployment (EC2, ALB, CloudFront, S3)
+- S3 + CloudFront for frontend static assets
+- ALB + Auto Scaling for backend
 - Email verification and password reset (SES or SendGrid)
 - Exercise name autocomplete
 - Workout grouping (multiple exercises per session)
