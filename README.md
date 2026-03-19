@@ -1,195 +1,118 @@
-# SparkMvmt – Exercise Tracker
+# SparkMvmt
 
-Create, edit, review, and delete exercise logs.
+Full-stack exercise tracker with JWT token rotation, httpOnly cookie auth, and Argon2 password hashing.
 
-SparkMvmt is a full-stack MERN application featuring a responsive React frontend and a REST API backend built with Express, Mongoose, and MongoDB.
+Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, and delete workouts through a responsive single-page UI.
 
-The app allows users to quickly log workouts, track exercise details, and manage their training history through a clean and responsive interface.
+## Screenshots
 
-## ⚠️ 3/12/26: In Progress: Auth Integration
-Backend auth is complete (JWT access/refresh tokens, protected routes). `test-requests.http` updated.
-Frontend auth UI is next — app will not load exercises until that lands. 
+![Sign up](docs/01-signup.png)
+*Account creation with real-time password validation*
 
-### Note - title is changing, new working title in code
+![Welcome](docs/02-home-empty.png)
+*Empty state with example row and welcome message*
 
----
+![Exercise log](docs/04-home-populated.png)
+*Home page with logged exercises*
 
-# Screenshots
-
-### Early Prototype
-<img width="607" height="405" alt="Screenshot 2026-03-10 at 7 47 42 AM" src="https://github.com/user-attachments/assets/b285916c-53c1-4861-b757-775fa74d3692" />
-
-
-### Current Version
-#### Home
-
-
-<img width="732" height="756" alt="Screenshot 2026-03-10 at 6 52 51 AM" src="https://github.com/user-attachments/assets/5c155e4c-898f-46d4-b923-fd7b8952146b" />
-
-#### Add
-
-<img width="550" height="834" alt="Screenshot 2026-03-10 at 7 13 14 AM" src="https://github.com/user-attachments/assets/7e23a124-0f89-46b6-a56f-e54ea04bf633" />
-
-The interface evolved significantly during development, progressing from a minimal prototype to a polished, responsive UI with improved table interactions, accessibility, and mobile support.
+![Log an exercise](docs/03-create-exercise.png)
+*Exercise form with bodyweight support*
 
 ---
 
-# Features
+## Features
 
-- Create, edit, duplicate, and delete exercise logs
-- Responsive UI (desktop and mobile layouts)
+- Log, edit, duplicate, and delete exercises
 - Bodyweight exercise support
-- Accessible form controls and icon buttons
-- Client-side form validation
-- MongoDB persistence
-- RESTful API backend
-- Environment-based configuration with `.env`
+- Responsive desktop and mobile layouts
+- Accessible form controls with keyboard navigation
+- Real-time form validation with toast feedback
+
+## Technical Highlights
+
+- JWT access/refresh token rotation with httpOnly cookie storage
+- Argon2 password hashing with input length limits
+- Silent token refresh on 401 and session restoration on page load
+- Object-level authorization — all exercise queries scoped to the authenticated user
+- RESTful API with protected routes and middleware auth
 
 ---
 
-# Tech Stack
+## Project Structure
 
-### Frontend
-- React
-- Vite
-- React Router
-- React Icons
+```
+├── frontend/
+│   └── src/
+│       ├── pages/          # LoginPage, HomePage, CreateExercise, EditExercise
+│       ├── components/     # ExerciseForm, ExerciseTable, ExerciseRow, Toast
+│       └── utils/          # API client (token refresh, auth headers), date helpers
+├── backend/
+│   ├── controller.mjs      # Express app, exercise CRUD routes
+│   ├── auth.mjs            # Signup, login, refresh, logout
+│   ├── middleware.mjs       # Auth middleware (token verification)
+│   ├── model.mjs           # Exercise schema
+│   └── userModel.mjs       # User schema
+```
+
+---
+
+## Running Locally
 
 ### Backend
-- Node.js
-- Express
-- MongoDB
-- Mongoose
 
----
-
-# Project Structure
-
-
-/frontend → Frontend (React + Vite)
-/backend → REST API (Node.js, Express, MongoDB)
-
-The backend can run independently of the frontend.
-The frontend can also run without the backend for UI development, though CRUD functionality will not be available.
-
----
-
-# Running the Project Locally
-
-## Backend Setup
-
-This project requires a **MongoDB connection string**.
-
-You can obtain one by creating a free MongoDB Atlas account:
-
-https://www.mongodb.com/resources/products/fundamentals/mongodb-connection-string
-
-### Configure environment variables
-
-Copy the example file:
-
-`cp .env.example .env`
-
-Then populate the values. 
-
-### Start the backend
-
-From `backend` folder:
-```
+```bash
+cd backend
+cp .env.example .env    # add your MongoDB URI and JWT secrets
 npm install
 npm start
 ```
 
+You'll need a MongoDB connection string — [MongoDB Atlas](https://www.mongodb.com/resources/products/fundamentals/mongodb-connection-string) offers a free tier.
 
-The server will indicate whether the MongoDB connection was successful.
+### Frontend
 
----
-
-### Frontend Setup
-
-From the `frontend` folder:
-
-```
+```bash
+cd frontend
 npm install
 npm run dev
 ```
-The application will run locally at http://localhost:5173
 
+Runs at http://localhost:5173. The Vite dev server proxies `/api` requests to the backend on port 3000.
 
-If that port is already in use, Vite will automatically select another available port.
+### API Testing
 
----
-
-## Using the App
-
-Once both frontend and backend are running you can:
-
-- Log new exercises
-- Edit existing workouts
-- Duplicate previous entries
-- Delete exercises
-- View all stored workouts
-
-All changes persist to your MongoDB database.
+The included `test-requests.http` file covers all endpoints. Use the [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) VS Code extension to send requests directly from the file.
 
 ---
 
-## API Testing
+## Design Decisions
 
-You can interact with the backend API directly using the included file:
-`test-requests.http`
+### Auth Architecture
+Short-lived access tokens held in memory, long-lived refresh tokens in httpOnly cookies. Access tokens are never persisted to localStorage to limit XSS exposure.
 
+Argon2 over bcrypt for password hashing due to resistance to GPU-based attacks. Input length limits prevent hash-based DoS. The frontend API client handles silent token refresh on 401 and session restoration on page load, so users stay logged in across tabs without tokens in storage.
 
-Many IDEs (such as VS Code with the REST Client extension) allow sending HTTP requests directly from this file.
+### Demo Mode
+A `DEMO_READ_ONLY` flag disables write operations, allowing the app to be deployed publicly without exposing the database to modifications.
 
----
-
-# Design Decisions
-
-SparkMvmt was built with a focus on clarity, maintainability, and progressive improvement.
-
-## Stateless REST API
-The backend is a simple REST API built with Express and Mongoose. The API remains stateless and can be tested independently of the frontend.
-
-## Frontend / Backend Separation
-The frontend (`react`) and backend (`rest`) are separate applications. This mirrors real-world deployments and allows each layer to run independently during development.
-
-## Environment Configuration
-Runtime configuration is handled through environment variables using `.env`. A `.env.example` file is provided so the project can be configured easily without exposing secrets.
-
-## Demo Mode Support
-The `DEMO_READ_ONLY` flag can disable write operations. This allows the project to be deployed publicly in demo mode without allowing database modifications.
-
-## Responsive UI
-The interface adapts between a compact stacked layout and a wider table layout to remain usable on both desktop and smaller screens.
-
-## Accessibility Considerations
-The interface attempts to support accessible interaction patterns:
-
-- Button elements are used for action icons
-- `aria-label` attributes are included for icon buttons
-- Focus states are preserved for keyboard navigation
-
-## Progressive UI Iteration
-The UI evolved significantly during development. Early versions focused on functionality, while later iterations improved:
-
-- visual hierarchy and appeal
-- table layout consistency
-- clear action buttons
-- responsive form design
+### Accessibility
+Button elements for all actions, `aria-label` on icon buttons, preserved focus states for keyboard navigation.
 
 ---
 
-# Roadmap
+## Roadmap
 
-Planned improvements include:
-
-- Application deployment (AWS: EC2, ALB, Cloudfront, S3 - initiated)
-- User authentication (JWT, nearing completion)
+- AWS deployment (EC2, ALB, CloudFront, S3)
+- Email verification and password reset (SES or SendGrid)
 - Exercise name autocomplete
-- Grouping exercises by workouts
-- Notes field
-- Encryption of entries
+- Workout grouping (multiple exercises per session)
+- Support for distance, time-based, and freeform activities (runs, hikes, classes)
+- Workout planning with completion tracking and rep reporting
+- Post-workout reflection (how it felt)
+- Exercise recommendations based on training history
+- Stripe integration for premium features
+
+**Long-term vision:** LLM-powered coaching — build a plan, get feedback on a session, and talk through what's next. The goal is for users to come here not just to log, but to move.
 
 ---
 
@@ -202,4 +125,3 @@ MIT License
 ## Author
 
 Quinn Redwoods
-
