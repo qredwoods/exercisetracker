@@ -6,6 +6,30 @@ Full-stack exercise tracker with JWT token rotation, httpOnly cookie auth, and A
 
 Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, and delete workouts through a responsive single-page UI.
 
+## Architecture
+
+```
+                  ┌──────────────────────────────┐
+                  │        CloudFront CDN         │
+  sparkmvmt.com → │   Origin: S3 (frontend/dist)  │
+                  └──────────────────────────────┘
+
+                  ┌──────────────────────────────┐
+                  │        EC2 Instance           │
+api.sparkmvmt.com│  Nginx → PM2 → Express :3000  │
+        →        │  TLS via Certbot (Let's Encrypt)│
+                  └──────────┬───────────────────┘
+                             │
+                  ┌──────────▼───────────────────┐
+                  │      MongoDB Atlas            │
+                  └──────────────────────────────┘
+```
+
+- **Frontend:** Vite + React SPA deployed to S3, served via CloudFront
+- **Backend:** Express + Mongoose on EC2, behind Nginx reverse proxy, managed by PM2
+- **Auth:** httpOnly cookie-based refresh tokens, cross-subdomain via `.sparkmvmt.com`
+- **Domains:** `sparkmvmt.com` (frontend via CloudFront) · `api.sparkmvmt.com` (backend via EC2)
+
 ## Screenshots
 
 ![Sign up](docs/01-signup.png)
@@ -44,7 +68,8 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
 - Silent token refresh on 401 and session restoration on page load
 - Object-level authorization — all exercise queries scoped to the authenticated user
 - RESTful API with protected routes and middleware auth
-- Production deployment on EC2 with Nginx and HTTPS via Certbot
+- Production: S3 + CloudFront (frontend), EC2 + Nginx + PM2 (backend), HTTPS via Certbot
+- Cross-subdomain auth cookies scoped to `.sparkmvmt.com`
 
 ---
 
@@ -75,11 +100,47 @@ npm run install:all
 npm run dev
 ```
 
-Starts both backend (nodemon, port 3000) and frontend (Vite, port 5173) with a single command. You'll need a MongoDB connection string — [MongoDB Atlas](https://www.mongodb.com/resources/products/fundamentals/mongodb-connection-string) offers a free tier.
+Starts both backend (nodemon, port 3000) and frontend (Vite, port 5173) with a single command. The Vite dev server proxies `/api` requests to the backend automatically.
+
+You'll need:
+- **Node.js** 18+
+- **MongoDB** connection string — [MongoDB Atlas](https://www.mongodb.com/resources/products/fundamentals/mongodb-connection-string) offers a free tier
+- **JWT secrets** — generate with: `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`
 
 ### API Testing
 
 The included `test-requests.http` file covers all endpoints. Use the [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) VS Code extension to send requests directly from the file.
+
+## Production Deployment
+
+### Frontend (S3 + CloudFront)
+
+1. Build the frontend: `cd frontend && npm run build`
+2. Sync `dist/` to your S3 bucket (static website hosting enabled)
+3. CloudFront distribution points to the S3 origin with `index.html` as the default root object and error page (for SPA routing)
+4. `sparkmvmt.com` DNS points to the CloudFront distribution
+
+### Backend (EC2 + Nginx + PM2)
+
+1. On the EC2 instance, clone the repo and install backend dependencies
+2. Set production environment variables (or use AWS Secrets Manager):
+   - `NODE_ENV=production`
+   - `MONGODB_URI`, `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`
+   - `CORS_ORIGIN=https://sparkmvmt.com`
+3. Start with PM2: `pm2 start backend/controller.mjs --name exercisetracker`
+4. Nginx reverse proxies `api.sparkmvmt.com` → `localhost:3000`
+5. TLS via Certbot (Let's Encrypt) on the Nginx layer
+
+### Environment Variables (Production)
+
+| Variable | Description |
+|---|---|
+| `NODE_ENV` | Must be `production` (enforces secure cookies, requires JWT secrets) |
+| `MONGODB_URI` | MongoDB Atlas connection string |
+| `ACCESS_TOKEN_SECRET` | Random 64-byte hex string for signing access JWTs |
+| `REFRESH_TOKEN_SECRET` | Random 64-byte hex string for signing refresh JWTs |
+| `CORS_ORIGIN` | Frontend URL, e.g. `https://sparkmvmt.com` |
+| `DEMO_READ_ONLY` | Set to `true` to disable write operations |
 
 ---
 
@@ -100,7 +161,6 @@ Button elements for all actions, `aria-label` on icon buttons, preserved focus s
 
 ## Roadmap
 
-- S3 + CloudFront for frontend static assets
 - ALB + Auto Scaling for backend
 - Email verification and password reset (SES or SendGrid)
 - Exercise name autocomplete
