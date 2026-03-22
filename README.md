@@ -9,20 +9,20 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
 ## Architecture
 
 ```
-                  ┌──────────────────────────────┐
-                  │        CloudFront CDN         │
-  sparkmvmt.com → │   Origin: S3 (frontend/dist)  │
-                  └──────────────────────────────┘
+                     ┌──────────────────────────────────┐
+   sparkmvmt.com  →  │          CloudFront CDN           │
+                     │     Origin: S3 (frontend/dist)    │
+                     └──────────────────────────────────┘
 
-                  ┌──────────────────────────────┐
-                  │        EC2 Instance           │
-api.sparkmvmt.com│  Nginx → PM2 → Express :3000  │
-        →        │  TLS via Certbot (Let's Encrypt)│
-                  └──────────┬───────────────────┘
-                             │
-                  ┌──────────▼───────────────────┐
-                  │      MongoDB Atlas            │
-                  └──────────────────────────────┘
+                     ┌──────────────────────────────────┐
+api.sparkmvmt.com →  │          EC2 Instance             │
+                     │  Nginx → PM2 → Express :3000      │
+                     │  TLS via Certbot (Let's Encrypt)   │
+                     └───────────────┬──────────────────┘
+                                     │
+                     ┌───────────────▼──────────────────┐
+                     │         MongoDB Atlas             │
+                     └──────────────────────────────────┘
 ```
 
 - **Frontend:** Vite + React SPA deployed to S3, served via CloudFront
@@ -63,13 +63,11 @@ api.sparkmvmt.com│  Nginx → PM2 → Express :3000  │
 
 ## Technical Highlights
 
-- JWT access/refresh token rotation with httpOnly cookie storage
-- Argon2 password hashing with input length limits
+- JWT access/refresh token rotation — access tokens in memory (never localStorage), refresh tokens in httpOnly cookies
+- Argon2 password hashing with input length limits to prevent hash DoS
 - Silent token refresh on 401 and session restoration on page load
 - Object-level authorization — all exercise queries scoped to the authenticated user
-- RESTful API with protected routes and middleware auth
-- Production: S3 + CloudFront (frontend), EC2 + Nginx + PM2 (backend), HTTPS via Certbot
-- Cross-subdomain auth cookies scoped to `.sparkmvmt.com`
+- Rate limiting on auth endpoints, helmet security headers, query parameter whitelisting against NoSQL injection
 
 ---
 

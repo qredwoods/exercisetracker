@@ -20,6 +20,15 @@ const authLimiter = rateLimit({
 router.use('/login', authLimiter);
 router.use('/signup', authLimiter);
 
+const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 30 : 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Please try again later.' },
+});
+router.use('/refresh', refreshLimiter);
+
 const IS_PROD = process.env.NODE_ENV === 'production';
 
 if (IS_PROD && (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET)) {
@@ -213,6 +222,7 @@ router.post('/logout', (req, res) => {
     secure: IS_PROD,
     sameSite: 'lax',
     path: '/',
+    ...(IS_PROD && { domain: '.sparkmvmt.com' }),
   });
   res.status(200).json({ message: 'Logged out.' });
 });

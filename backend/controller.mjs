@@ -6,8 +6,11 @@ import { authRouter } from "./auth.mjs";
 import { requireAuth } from "./middleware.mjs";
 import "dotenv/config";
 import cors from "cors";
+import helmet from "helmet";
 
 const app = express();
+
+app.use(helmet());
 
 const ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";
 
@@ -181,10 +184,12 @@ app.post("/api/exercises", async (req, res) => {
 // get exercises (scoped to user)
 app.get("/api/exercises", async (req, res) => {
   try {
-    const results = await model.findExercises({
-      ...req.query,
-      userId: req.userId,
-    });
+    const filter = { userId: req.userId };
+    if (typeof req.query.name === "string") filter.name = req.query.name;
+    if (typeof req.query.unit === "string") filter.unit = req.query.unit;
+    if (typeof req.query.date === "string") filter.date = req.query.date;
+
+    const results = await model.findExercises(filter);
     res.status(200).json(results);
   } catch (err) {
     console.error(err);
@@ -238,10 +243,12 @@ app.put("/api/exercises/:_id", async (req, res) => {
 // delete all (scoped to user)
 app.delete("/api/exercises", async (req, res) => {
   try {
-    const result = await model.deleteExercises({
-      ...req.query,
-      userId: req.userId,
-    });
+    const filter = { userId: req.userId };
+    if (typeof req.query.name === "string") filter.name = req.query.name;
+    if (typeof req.query.unit === "string") filter.unit = req.query.unit;
+    if (typeof req.query.date === "string") filter.date = req.query.date;
+
+    const result = await model.deleteExercises(filter);
     res.status(200).json({ deletedCount: result.deletedCount });
   } catch (err) {
     console.error(err);
