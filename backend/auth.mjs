@@ -40,13 +40,19 @@ function signRefreshToken(userId) {
 }
 
 function setRefreshCookie(res, token) {
-  res.cookie('refreshToken', token, {
+  const cookieOptions = {
     httpOnly: true,
     secure: IS_PROD,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
-  });
+  };
+
+    if (IS_PROD) {
+    cookieOptions.domain = '.sparkmvmt.com';
+  }
+
+  res.cookie('refreshToken', token, cookieOptions);
 }
 
 // ── signup ──────────────────────────────────────────────
