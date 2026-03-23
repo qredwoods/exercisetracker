@@ -16,17 +16,19 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
 
                      ┌──────────────────────────────────┐
 api.sparkmvmt.com →  │          EC2 Instance            │
-                     │  Nginx → PM2 → Express :3000     │
+                     │  Nginx → Docker → Express :3000  │
                      │  TLS via Certbot (Let's Encrypt) │
                      └───────────────┬──────────────────┘
                                      │
                      ┌───────────────▼──────────────────┐
                      │         MongoDB Atlas            │
                      └──────────────────────────────────┘
+
+Deploy: docker build → push to ECR → pull on EC2
 ```
 
 - **Frontend:** Vite + React SPA deployed to S3, served via CloudFront
-- **Backend:** Express + Mongoose on EC2, behind Nginx reverse proxy, managed by PM2
+- **Backend:** Express + Mongoose in a Docker container on EC2, behind Nginx reverse proxy, image pulled from ECR
 - **Auth:** httpOnly cookie-based refresh tokens, cross-subdomain via `.sparkmvmt.com`
 - **Domains:** `sparkmvmt.com` (frontend via CloudFront) · `api.sparkmvmt.com` (backend via EC2)
 
@@ -68,6 +70,9 @@ api.sparkmvmt.com →  │          EC2 Instance            │
 - Silent token refresh on 401 and session restoration on page load
 - Object-level authorization — all exercise queries scoped to the authenticated user
 - Rate limiting on auth endpoints, helmet security headers, query parameter whitelisting against NoSQL injection
+- Dockerized backend with multi-stage builds (argon2 native compilation in builder, slim production image)
+- Graceful shutdown on SIGTERM for zero-downtime container deploys
+- ECR image pipeline with IAM instance role authentication
 
 ---
 
@@ -80,12 +85,16 @@ api.sparkmvmt.com →  │          EC2 Instance            │
 │       ├── components/     # ExerciseForm, ExerciseTable, ExerciseRow, ConfirmOverlay, Toast
 │       └── utils/          # API client (token refresh, auth headers), date helpers, useFormError hook
 ├── backend/
-│   ├── controller.mjs      # Express app, exercise CRUD routes
+│   ├── controller.mjs      # Express app, exercise CRUD routes, graceful shutdown
 │   ├── auth.mjs            # Signup, login, refresh, logout, demo account creation
+│   ├── benchmark.mjs       # CPU-bound load test endpoint (synthetic LLM coaching profiles)
 │   ├── demoSeed.mjs        # Seed data generator for demo accounts
 │   ├── middleware.mjs       # Auth middleware (token verification)
 │   ├── model.mjs           # Exercise schema (name, reps, weight, unit, date, notes)
-│   └── userModel.mjs       # User schema (with demo TTL support)
+│   ├── userModel.mjs       # User schema (with demo TTL support)
+│   ├── Dockerfile           # Multi-stage build (Node 24 Alpine, argon2 native deps)
+│   ├── compose.yaml         # Local container testing
+│   └── k6-benchmark.js     # k6 load test script
 ```
 
 ---
@@ -118,14 +127,11 @@ The included `test-requests.http` file covers all endpoints. Use the [REST Clien
 3. CloudFront distribution points to the S3 origin with `index.html` as the default root object and error page (for SPA routing)
 4. `sparkmvmt.com` DNS points to the CloudFront distribution
 
-### Backend (EC2 + Nginx + PM2)
+### Backend (EC2 + Nginx + Docker + ECR)
 
-1. On the EC2 instance, clone the repo and install backend dependencies
-2. Set production environment variables (or use AWS Secrets Manager):
-   - `NODE_ENV=production`
-   - `MONGODB_URI`, `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`
-   - `CORS_ORIGIN=https://sparkmvmt.com`
-3. Start with PM2: `pm2 start backend/controller.mjs --name exercisetracker`
+1. Build, tag, and push the image from local: `docker build` → `docker push` to ECR
+2. On EC2, pull the image and run with `--env-file` and `--restart unless-stopped`
+3. EC2 authenticates with ECR via IAM instance role (`AmazonEC2ContainerRegistryPullOnly`)
 4. Nginx reverse proxies `api.sparkmvmt.com` → `localhost:3000`
 5. TLS via Certbot (Let's Encrypt) on the Nginx layer
 
@@ -159,7 +165,7 @@ Button elements for all actions, `aria-label` on icon buttons, preserved focus s
 
 ## Roadmap
 
-- ALB + Auto Scaling for backend
+- ALB + Auto Scaling for backend *(in progress)*
 - Email verification and password reset (SES or SendGrid)
 - Exercise name autocomplete
 - Workout grouping (multiple exercises per session)
