@@ -10,18 +10,18 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
 
 ```
                      ┌──────────────────────────────────┐
-   sparkmvmt.com  →  │          CloudFront CDN           │
-                     │     Origin: S3 (frontend/dist)    │
+   sparkmvmt.com  →  │          CloudFront CDN          │
+                     │     Origin: S3 (frontend/dist)   │
                      └──────────────────────────────────┘
 
                      ┌──────────────────────────────────┐
-api.sparkmvmt.com →  │          EC2 Instance             │
-                     │  Nginx → PM2 → Express :3000      │
-                     │  TLS via Certbot (Let's Encrypt)   │
+api.sparkmvmt.com →  │          EC2 Instance            │
+                     │  Nginx → PM2 → Express :3000     │
+                     │  TLS via Certbot (Let's Encrypt) │
                      └───────────────┬──────────────────┘
                                      │
                      ┌───────────────▼──────────────────┐
-                     │         MongoDB Atlas             │
+                     │         MongoDB Atlas            │
                      └──────────────────────────────────┘
 ```
 
