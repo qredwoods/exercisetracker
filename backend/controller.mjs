@@ -7,6 +7,7 @@ import { requireAuth } from "./middleware.mjs";
 import "dotenv/config";
 import cors from "cors";
 import helmet from "helmet";
+import { benchmarkRouter } from "./benchmark.mjs";
 
 const app = express();
 
@@ -161,6 +162,8 @@ app.get("/health", async (_, res) => {
   }
 });
 
+app.use("/benchmark", benchmarkRouter);
+
 // create new exercise (scoped to user)
 app.post("/api/exercises", async (req, res) => {
   try {
@@ -276,5 +279,14 @@ const PORT = process.env.PORT || 5000;
 
 (async () => {
   await model.connect();
-  app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`));
+  const server = app.listen(PORT, () =>
+    console.log(`Server listening on port ${PORT}...`)
+  );
+
+  process.on("SIGTERM", () => {
+    console.log("SIGTERM received, shutting down gracefully...");
+    server.close(() => {
+      model.disconnect().then(() => process.exit(0));
+    });
+  });
 })();

@@ -116,4 +116,9 @@ const deleteById = async (_id, userId) => {
   return result.deletedCount;
 }
 
-export {connect, Exercise, createExercise, deleteExercises, findExercises, deleteById, findExerciseById, updateExercise}
+async function disconnect() {
+  await mongoose.disconnect();
+  console.log("Disconnected from MongoDB.");
+}
+
+export {connect, disconnect, Exercise, createExercise, deleteExercises, findExercises, deleteById, findExerciseById, updateExercise}
