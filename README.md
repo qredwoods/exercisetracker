@@ -15,22 +15,27 @@ Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, an
                      └──────────────────────────────────┘
 
                      ┌──────────────────────────────────┐
-api.sparkmvmt.com →  │          EC2 Instance            │
-                     │  Nginx → Docker → Express :3000  │
-                     │  TLS via Certbot (Let's Encrypt) │
+api.sparkmvmt.com →  │    ALB (ACM TLS termination)     │
+                     └───────────────┬──────────────────┘
+                                     │
+                     ┌───────────────▼──────────────────┐
+                     │     Auto Scaling Group (1-3)     │
+                     │     EC2 + Docker → Express :3000 │
+                     │     Images pulled from ECR       │
+                     │     Secrets from SSM             │
                      └───────────────┬──────────────────┘
                                      │
                      ┌───────────────▼──────────────────┐
                      │         MongoDB Atlas            │
                      └──────────────────────────────────┘
 
-Deploy: docker build → push to ECR → pull on EC2
+Deploy: docker build → push to ECR → ASG instances pull on boot
 ```
 
 - **Frontend:** Vite + React SPA deployed to S3, served via CloudFront
-- **Backend:** Express + Mongoose in a Docker container on EC2, behind Nginx reverse proxy, image pulled from ECR
+- **Backend:** Express + Mongoose in Docker containers on EC2, behind ALB with ACM cert, auto-scaled via ASG
 - **Auth:** httpOnly cookie-based refresh tokens, cross-subdomain via `.sparkmvmt.com`
-- **Domains:** `sparkmvmt.com` (frontend via CloudFront) · `api.sparkmvmt.com` (backend via EC2)
+- **Domains:** `sparkmvmt.com` (frontend via CloudFront) · `api.sparkmvmt.com` (backend via ALB)
 
 ## Screenshots
 
@@ -94,7 +99,8 @@ Deploy: docker build → push to ECR → pull on EC2
 │   ├── userModel.mjs       # User schema (with demo TTL support)
 │   ├── Dockerfile           # Multi-stage build (Node 24 Alpine, argon2 native deps)
 │   ├── compose.yaml         # Local container testing
-│   └── k6-benchmark.js     # k6 load test script
+│   ├── k6-benchmark.js     # k6 load test script
+│   └── user-data.sh        # EC2 bootstrap: pull image from ECR, fetch secrets from SSM
 ```
 
 ---
@@ -127,13 +133,12 @@ The included `test-requests.http` file covers all endpoints. Use the [REST Clien
 3. CloudFront distribution points to the S3 origin with `index.html` as the default root object and error page (for SPA routing)
 4. `sparkmvmt.com` DNS points to the CloudFront distribution
 
-### Backend (EC2 + Nginx + Docker + ECR)
+### Backend (ALB + ASG + Docker + ECR)
 
-1. Build, tag, and push the image from local: `docker build` → `docker push` to ECR
-2. On EC2, pull the image and run with `--env-file` and `--restart unless-stopped`
-3. EC2 authenticates with ECR via IAM instance role (`AmazonEC2ContainerRegistryPullOnly`)
-4. Nginx reverse proxies `api.sparkmvmt.com` → `localhost:3000`
-5. TLS via Certbot (Let's Encrypt) on the Nginx layer
+1. Build and push the Docker image: `docker build` → `docker push` to ECR
+2. ASG launches EC2 instances from a launch template with user data that pulls the image from ECR and fetches secrets from SSM Parameter Store
+3. ALB terminates TLS (ACM cert), routes traffic to healthy instances via target group health checks on `/health`
+4. Auto Scaling Group maintains 1-3 instances based on CPU utilization
 
 ### Environment Variables (Production)
 
@@ -165,7 +170,7 @@ Button elements for all actions, `aria-label` on icon buttons, preserved focus s
 
 ## Roadmap
 
-- ALB + Auto Scaling for backend *(in progress)*
+- CI/CD pipeline (GitHub Actions → ECR → ASG)
 - Email verification and password reset (SES or SendGrid)
 - Exercise name autocomplete
 - Workout grouping (multiple exercises per session)
