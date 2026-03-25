@@ -2,9 +2,13 @@
 
 **[Live Demo →](https://sparkmvmt.com)**
 
-Full-stack exercise tracker with JWT token rotation, httpOnly cookie auth, and Argon2 password hashing.
+Full-stack exercise tracker where users log, edit, duplicate, and delete workouts through a responsive single-page UI. One-click demo mode lets anyone try it instantly.
 
-Built with React, Vite, Express, and MongoDB. Users can log, edit, duplicate, and delete workouts through a responsive single-page UI.
+React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. Secrets via SSM Parameter Store, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, and an automated test suite.
+
+**Just added:** 120 tests — 91 backend (node:test + supertest + mongodb-memory-server) and 29 E2E (Playwright).
+
+**Up next:** CI/CD via GitHub Actions (test → build → push to ECR → rolling ASG deploy), exercise autocomplete + filtering, and LLM-powered coaching.
 
 ## Architecture
 
