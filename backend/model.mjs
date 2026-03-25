@@ -1,39 +1,13 @@
 import mongoose from 'mongoose';
-import 'dotenv/config';
 
-
-const EXERCISE_COLLECTION = 'exercises';
-
-let connection = undefined;
-
-/**
- * This function does the following:
- *  1. Connects to the MongoDB server.
- *  2. Drop EXERCISE_COLLECTION if asked to do so.
- *  3. Creates a model class for the exercise schema.
- * @param {Boolean} dropCollection If true, drop EXERCISE_COLLECTION
- * 
- */
-async function connect(dropCollection){
-    try{
-        connection = await createConnection();
+async function connect() {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI);
         console.log("Successfully connected to MongoDB using Mongoose!");
-        if(dropCollection){
-            await connection.db.dropCollection(EXERCISE_COLLECTION);
-        }
-    } catch(err){
+    } catch(err) {
         console.log(err);
-        throw Error(`Could not connect to MongoDB ${err.message}`)
+        throw Error(`Could not connect to MongoDB ${err.message}`);
     }
-}
-
-/**
- * Connect to the MongoDB server for the connect string in .env file
- * @returns A connection to the server
- */
-async function createConnection(){
-    await mongoose.connect(process.env.MONGODB_URI);
-    return mongoose.connection;
 }
 
 // sets up structure of exercise

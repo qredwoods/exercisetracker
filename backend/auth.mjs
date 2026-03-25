@@ -57,7 +57,7 @@ function setRefreshCookie(res, token) {
     path: '/',
   };
 
-    if (IS_PROD) {
+  if (IS_PROD) {
     cookieOptions.domain = '.sparkmvmt.com';
   }
 
