@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "controller.mjs",
   "scripts": {
-    "test": "nodemon test",
+    "test": "node --test --test-concurrency=1 tests/**/*.test.mjs",
+    "test:validation": "node --test tests/validation.test.mjs",
+    "test:auth": "node --test tests/auth.test.mjs",
+    "test:exercises": "node --test tests/exercises.test.mjs",
     "start": "nodemon controller.mjs",
     "prod": "node controller.mjs"
   },
@@ -23,5 +26,9 @@
     "mongoose": "^8.7.0",
     "nodemon": "^3.1.11",
     "validator": "^13.15.26"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.0.1",
+    "supertest": "^7.2.2"
   }
 }

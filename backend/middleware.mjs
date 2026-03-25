@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { ACCESS_TOKEN_SECRET } from './auth.mjs';
 
 function requireAuth(req, res, next) {
@@ -19,4 +20,11 @@ function requireAuth(req, res, next) {
   }
 }
 
-export { requireAuth };
+function validateId(req, res, next) {
+  if (!mongoose.isValidObjectId(req.params._id)) {
+    return res.status(404).json({ error: "Not found" });
+  }
+  next();
+}
+
+export { requireAuth, validateId };

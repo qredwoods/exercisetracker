@@ -22,5 +22,9 @@ pnpm-debug.log*
 coverage/
 .capture/
 
+# e2e test artifacts
+e2e/test-results/
+e2e/playwright-report/
+
 # k6 reports
 benchmark-*.html
