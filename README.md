@@ -76,8 +76,10 @@ Deploy: docker build → push to ECR → ASG instances pull on boot
 - Object-level authorization — all exercise queries scoped to the authenticated user
 - Rate limiting on auth endpoints, helmet security headers, query parameter whitelisting against NoSQL injection
 - Dockerized backend with multi-stage builds (argon2 native compilation in builder, slim production image)
+- Express 5 with native async error propagation and central error middleware
 - Graceful shutdown on SIGTERM for zero-downtime container deploys
 - ECR image pipeline with IAM instance role authentication
+- 120 automated tests: 91 backend (node:test + supertest + mongodb-memory-server) and 29 E2E (Playwright)
 
 ---
 
@@ -90,17 +92,30 @@ Deploy: docker build → push to ECR → ASG instances pull on boot
 │       ├── components/     # ExerciseForm, ExerciseTable, ExerciseRow, ConfirmOverlay, Toast
 │       └── utils/          # API client (token refresh, auth headers), date helpers, useFormError hook
 ├── backend/
-│   ├── controller.mjs      # Express app, exercise CRUD routes, graceful shutdown
-│   ├── auth.mjs            # Signup, login, refresh, logout, demo account creation
-│   ├── benchmark.mjs       # CPU-bound load test endpoint (synthetic LLM coaching profiles)
-│   ├── demoSeed.mjs        # Seed data generator for demo accounts
-│   ├── middleware.mjs       # Auth middleware (token verification)
-│   ├── model.mjs           # Exercise schema (name, reps, weight, unit, date, notes)
-│   ├── userModel.mjs       # User schema (with demo TTL support)
-│   ├── Dockerfile           # Multi-stage build (Node 24 Alpine, argon2 native deps)
-│   ├── compose.yaml         # Local container testing
-│   ├── k6-benchmark.js     # k6 load test script
-│   └── user-data.sh        # EC2 bootstrap: pull image from ECR, fetch secrets from SSM
+│   ├── app.mjs              # Express app setup (routes, middleware, validation) — importable by tests
+│   ├── controller.mjs       # Entry point: connects DB, starts server
+│   ├── auth.mjs             # Signup, login, refresh, logout, demo account creation
+│   ├── middleware.mjs        # Auth middleware, ObjectId validation
+│   ├── model.mjs            # Exercise schema (name, reps, weight, unit, date, notes)
+│   ├── userModel.mjs        # User schema (with demo TTL support)
+│   ├── benchmark.mjs        # CPU-bound load test endpoint (synthetic LLM coaching profiles)
+│   ├── demoSeed.mjs         # Seed data generator for demo accounts
+│   ├── tests/               # Backend test suite (node:test + supertest + mongodb-memory-server)
+│   │   ├── setup.mjs        # In-memory MongoDB, test helpers
+│   │   ├── validation.test.mjs  # Input validation unit tests (30 tests)
+│   │   ├── auth.test.mjs        # Auth API integration tests (27 tests)
+│   │   └── exercises.test.mjs   # Exercise CRUD integration tests (34 tests)
+│   ├── Dockerfile            # Multi-stage build (Node 24 Alpine, argon2 native deps)
+│   ├── compose.yaml          # Local container testing
+│   ├── k6-benchmark.js      # k6 load test script
+│   └── user-data.sh         # EC2 bootstrap: pull image from ECR, fetch secrets from SSM
+├── e2e/
+│   ├── tests/               # Playwright E2E tests (29 tests)
+│   │   ├── auth.spec.mjs    # Auth flows, demo mode, session restore
+│   │   ├── exercises-crud.spec.mjs  # CRUD, duplicate, discard guard, delete cancel
+│   │   ├── form-validation.spec.mjs # Form + signup validation
+│   │   └── helpers.mjs      # Shared selectors and test utilities
+│   └── playwright.config.mjs
 ```
 
 ---
@@ -116,11 +131,22 @@ npm run dev
 Starts both backend (nodemon, port 3000) and frontend (Vite, port 5173) with a single command. The Vite dev server proxies `/api` requests to the backend automatically.
 
 You'll need:
-- **Node.js** 18+
+- **Node.js** 24+
 - **MongoDB** connection string — [MongoDB Atlas](https://www.mongodb.com/resources/products/fundamentals/mongodb-connection-string) offers a free tier
 - **JWT secrets** — generate with: `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`
 
-### API Testing
+### Testing
+
+```bash
+cd backend && npm test              # 91 backend tests (~4s)
+cd e2e && npm test       # 29 E2E tests (~24s, needs servers running)
+```
+
+**Backend tests** use an in-memory MongoDB (mongodb-memory-server) — no external database needed. Covers input validation, auth flows, exercise CRUD, user isolation, and malformed ID handling.
+
+**E2E tests** use Playwright against running dev servers. Covers auth, full CRUD, form validation, demo mode, discard guards, and session persistence.
+
+### API Testing (manual)
 
 The included `test-requests.http` file covers all endpoints. Use the [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) VS Code extension to send requests directly from the file.
 
@@ -170,7 +196,7 @@ Button elements for all actions, `aria-label` on icon buttons, preserved focus s
 
 ## Roadmap
 
-- CI/CD pipeline (GitHub Actions → ECR → ASG)
+- CI/CD pipeline (GitHub Actions → test → ECR → ASG rolling deploy)
 - Email verification and password reset (SES or SendGrid)
 - Exercise name autocomplete
 - Workout grouping (multiple exercises per session)
@@ -180,7 +206,7 @@ Button elements for all actions, `aria-label` on icon buttons, preserved focus s
 - Exercise recommendations based on training history
 - Stripe integration for premium features
 
-**Long-term vision:** LLM-powered coaching — build a plan, get feedback on a session, and talk through what's next. The goal is for users to come here not just to log, but to move.
+**Long-term vision:** LLM-powered coaching — build a plan, get feedback on a session, and talk through what's next. The goal is for users to come here not just to log, but for help getting moving.
 
 ---
 
