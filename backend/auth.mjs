@@ -66,103 +66,93 @@ function setRefreshCookie(res, token) {
 
 // ── signup ──────────────────────────────────────────────
 router.post('/signup', async (req, res) => {
-  try {
-    const { firstName, lastName, email, password, ageConfirmed } = req.body;
+  const { firstName, lastName, email, password, ageConfirmed } = req.body;
 
-    if (!ageConfirmed) {
-      return res.status(400).json({ error: 'You must confirm you are 13 or older.' });
-    }
-
-    if (!firstName?.trim() || !lastName?.trim()) {
-      return res.status(400).json({ error: 'First and last name are required.' });
-    }
-
-    if (firstName.trim().length > 50 || lastName.trim().length > 50) {
-      return res.status(400).json({ error: 'Name must be 50 characters or less.' });
-    }
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
-    }
-
-    if (email.length > 254) {
-      return res.status(400).json({ error: 'Email is too long.' });
-    }
-
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ error: 'Please enter a valid email address.' });
-    }
-
-    if (password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-    }
-
-    if (password.length > 128) {
-      return res.status(400).json({ error: 'Password must be 128 characters or less.' });
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      return res.status(400).json({ error: 'Password must contain at least one uppercase letter.' });
-    }
-
-    if (!/[a-z]/.test(password)) {
-      return res.status(400).json({ error: 'Password must contain at least one lowercase letter.' });
-    }
-
-    if (!/[0-9]/.test(password)) {
-      return res.status(400).json({ error: 'Password must contain at least one number.' });
-    }
-
-    const existing = await findUserByEmail(email);
-    if (existing) {
-      return res.status(409).json({ error: 'An account with this email already exists.' });
-    }
-
-    const user = await createUser(firstName.trim(), lastName.trim(), email, password);
-
-    const accessToken = signAccessToken(user._id);
-    const refreshToken = signRefreshToken(user._id);
-    setRefreshCookie(res, refreshToken);
-
-    res.status(201).json({ user, accessToken });
-  } catch (err) {
-    console.error('Signup error:', err);
-    res.status(500).json({ error: 'Server error.' });
+  if (!ageConfirmed) {
+    return res.status(400).json({ error: 'You must confirm you are 13 or older.' });
   }
+
+  if (!firstName?.trim() || !lastName?.trim()) {
+    return res.status(400).json({ error: 'First and last name are required.' });
+  }
+
+  if (firstName.trim().length > 50 || lastName.trim().length > 50) {
+    return res.status(400).json({ error: 'Name must be 50 characters or less.' });
+  }
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
+
+  if (email.length > 254) {
+    return res.status(400).json({ error: 'Email is too long.' });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: 'Please enter a valid email address.' });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  }
+
+  if (password.length > 128) {
+    return res.status(400).json({ error: 'Password must be 128 characters or less.' });
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    return res.status(400).json({ error: 'Password must contain at least one uppercase letter.' });
+  }
+
+  if (!/[a-z]/.test(password)) {
+    return res.status(400).json({ error: 'Password must contain at least one lowercase letter.' });
+  }
+
+  if (!/[0-9]/.test(password)) {
+    return res.status(400).json({ error: 'Password must contain at least one number.' });
+  }
+
+  const existing = await findUserByEmail(email);
+  if (existing) {
+    return res.status(409).json({ error: 'An account with this email already exists.' });
+  }
+
+  const user = await createUser(firstName.trim(), lastName.trim(), email, password);
+
+  const accessToken = signAccessToken(user._id);
+  const refreshToken = signRefreshToken(user._id);
+  setRefreshCookie(res, refreshToken);
+
+  res.status(201).json({ user, accessToken });
 });
 
 // ── login ───────────────────────────────────────────────
 router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
-    }
-
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ error: 'Please enter a valid email address.' });
-    }
-
-    const user = await findUserByEmail(email);
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
-    }
-
-    const valid = await verifyPassword(user, password);
-    if (!valid) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
-    }
-
-    const accessToken = signAccessToken(user._id);
-    const refreshToken = signRefreshToken(user._id);
-    setRefreshCookie(res, refreshToken);
-
-    res.status(200).json({ user, accessToken });
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Server error.' });
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
   }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: 'Please enter a valid email address.' });
+  }
+
+  const user = await findUserByEmail(email);
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid email or password.' });
+  }
+
+  const valid = await verifyPassword(user, password);
+  if (!valid) {
+    return res.status(401).json({ error: 'Invalid email or password.' });
+  }
+
+  const accessToken = signAccessToken(user._id);
+  const refreshToken = signRefreshToken(user._id);
+  setRefreshCookie(res, refreshToken);
+
+  res.status(200).json({ user, accessToken });
 });
 
 // ── refresh ─────────────────────────────────────────────
@@ -190,29 +180,24 @@ router.post('/refresh', async (req, res) => {
 
 // ── demo ───────────────────────────────────────────────
 router.post('/demo', authLimiter, async (req, res) => {
-  try {
-    const id = crypto.randomUUID().slice(0, 8);
-    const email = `demo_${id}@sparkmvmt.com`;
-    const password = `Demo!${crypto.randomUUID()}`;
-    const demoExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const id = crypto.randomUUID().slice(0, 8);
+  const email = `demo_${id}@sparkmvmt.com`;
+  const password = `Demo!${crypto.randomUUID()}`;
+  const demoExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    const user = await createUser('Demo', 'User', email, password);
-    user.isDemo = true;
-    user.demoExpiresAt = demoExpiresAt;
-    await user.save();
+  const user = await createUser('Demo', 'User', email, password);
+  user.isDemo = true;
+  user.demoExpiresAt = demoExpiresAt;
+  await user.save();
 
-    const exercises = generateDemoExercises(user._id, demoExpiresAt);
-    await Exercise.insertMany(exercises);
+  const exercises = generateDemoExercises(user._id, demoExpiresAt);
+  await Exercise.insertMany(exercises);
 
-    const accessToken = signAccessToken(user._id);
-    const refreshToken = signRefreshToken(user._id);
-    setRefreshCookie(res, refreshToken);
+  const accessToken = signAccessToken(user._id);
+  const refreshToken = signRefreshToken(user._id);
+  setRefreshCookie(res, refreshToken);
 
-    res.status(201).json({ user, accessToken });
-  } catch (err) {
-    console.error('Demo error:', err);
-    res.status(500).json({ error: 'Could not create demo account.' });
-  }
+  res.status(201).json({ user, accessToken });
 });
 
 // ── logout ──────────────────────────────────────────────

@@ -51,16 +51,11 @@ app.use("/api/auth", authRouter);
 
 // ── everything below requires authentication ────────────
 app.get("/api/auth/me", requireAuth, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found." });
-    }
-    res.status(200).json({ user });
-  } catch (err) {
-    console.error("Me error:", err);
-    res.status(500).json({ error: "Server error." });
+  const user = await User.findById(req.userId);
+  if (!user) {
+    return res.status(404).json({ error: "User not found." });
   }
+  res.status(200).json({ user });
 });
 
 app.use("/api/exercises", requireAuth);
@@ -156,125 +151,96 @@ function validateExerciseBody(body) {
 
 // health check (public)
 app.get("/health", async (_, res) => {
-  try {
-    res.status(200).json({ status: "ok" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
-  }
+  res.status(200).json({ status: "ok" });
 });
 
 app.use("/benchmark", benchmarkRouter);
 
 // create new exercise (scoped to user)
 app.post("/api/exercises", async (req, res) => {
-  try {
-    const validation = validateExerciseBody(req.body);
+  const validation = validateExerciseBody(req.body);
 
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.error });
-    }
-
-    const exercise = await model.createExercise({
-      ...validation.data,
-      userId: req.userId,
-    });
-    res.status(201).json(exercise);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
+  if (!validation.valid) {
+    return res.status(400).json({ error: validation.error });
   }
+
+  const exercise = await model.createExercise({
+    ...validation.data,
+    userId: req.userId,
+  });
+  res.status(201).json(exercise);
 });
 
 // get exercises (scoped to user)
 app.get("/api/exercises", async (req, res) => {
-  try {
-    const filter = { userId: req.userId };
-    if (typeof req.query.name === "string") filter.name = req.query.name;
-    if (typeof req.query.unit === "string") filter.unit = req.query.unit;
-    if (typeof req.query.date === "string") filter.date = req.query.date;
+  const filter = { userId: req.userId };
+  if (typeof req.query.name === "string") filter.name = req.query.name;
+  if (typeof req.query.unit === "string") filter.unit = req.query.unit;
+  if (typeof req.query.date === "string") filter.date = req.query.date;
 
-    const results = await model.findExercises(filter);
-    res.status(200).json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
-  }
+  const results = await model.findExercises(filter);
+  res.status(200).json(results);
 });
 
 // get exercise by id (scoped to user)
 app.get("/api/exercises/:_id", validateId, async (req, res) => {
-  try {
-    const result = await model.findExerciseById(req.params._id);
+  const result = await model.findExerciseById(req.params._id);
 
-    if (result === null || result.userId?.toString() !== req.userId) {
-      return res.status(404).json({ error: "Not found" });
-    }
-
-    res.status(200).json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
+  if (result === null || result.userId?.toString() !== req.userId) {
+    return res.status(404).json({ error: "Not found" });
   }
+
+  res.status(200).json(result);
 });
 
 // update (scoped to user)
 app.put("/api/exercises/:_id", validateId, async (req, res) => {
-  try {
-    const validation = validateExerciseBody(req.body);
+  const validation = validateExerciseBody(req.body);
 
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.error });
-    }
-
-    // only update if the exercise belongs to this user
-    const result = await model.updateExercise(
-      req.params._id,
-      validation.data,
-      req.userId
-    );
-
-    if (result === null) {
-      return res.status(404).json({ error: "Not found" });
-    }
-
-    res.status(200).json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
+  if (!validation.valid) {
+    return res.status(400).json({ error: validation.error });
   }
+
+  // only update if the exercise belongs to this user
+  const result = await model.updateExercise(
+    req.params._id,
+    validation.data,
+    req.userId
+  );
+
+  if (result === null) {
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  res.status(200).json(result);
 });
 
 // delete all (scoped to user)
 app.delete("/api/exercises", async (req, res) => {
-  try {
-    const filter = { userId: req.userId };
-    if (typeof req.query.name === "string") filter.name = req.query.name;
-    if (typeof req.query.unit === "string") filter.unit = req.query.unit;
-    if (typeof req.query.date === "string") filter.date = req.query.date;
+  const filter = { userId: req.userId };
+  if (typeof req.query.name === "string") filter.name = req.query.name;
+  if (typeof req.query.unit === "string") filter.unit = req.query.unit;
+  if (typeof req.query.date === "string") filter.date = req.query.date;
 
-    const result = await model.deleteExercises(filter);
-    res.status(200).json({ deletedCount: result.deletedCount });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
-  }
+  const result = await model.deleteExercises(filter);
+  res.status(200).json({ deletedCount: result.deletedCount });
 });
 
 // delete by id (scoped to user)
 app.delete("/api/exercises/:_id", validateId, async (req, res) => {
-  try {
-    const result = await model.deleteById(req.params._id, req.userId);
+  const result = await model.deleteById(req.params._id, req.userId);
 
-    if (result === 0) {
-      return res.status(404).json({ error: "Not found" });
-    }
-
-    res.sendStatus(204);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
+  if (result === 0) {
+    return res.status(404).json({ error: "Not found" });
   }
+
+  res.sendStatus(204);
+});
+
+// ── central error handler ───────────────────────────────
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: "Server error." });
 });
 
 export { app, validateExerciseBody };
