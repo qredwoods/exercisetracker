@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import ExerciseRow, { formatDisplayDate } from './ExerciseRow'
 
 const EXAMPLE_ROW = {
@@ -9,8 +10,15 @@ const EXAMPLE_ROW = {
 };
 
 const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, isFirstVisit, fadeIn, onFadeComplete}) => {
+  const [sortOrder, setSortOrder] = useState("newest");
   const isEmpty = exercises.length === 0;
   const showWelcome = isEmpty && isFirstVisit;
+
+  const sorted = [...exercises].sort((a, b) =>
+    sortOrder === "newest"
+      ? b.date.localeCompare(a.date)
+      : a.date.localeCompare(b.date)
+  );
 
   return (
     <div>
@@ -21,7 +29,12 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, 
             <th>Name</th>
             <th>Reps</th>
             <th>Weight</th>
-            <th>Date</th>
+            <th
+              className="sortable-th"
+              onClick={() => setSortOrder(s => s === "newest" ? "oldest" : "newest")}
+            >
+              Date {sortOrder === "newest" ? "↓" : "↑"}
+            </th>
             <th colSpan={3}>Actions</th>
           </tr>
         </thead>
@@ -35,7 +48,7 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, 
             <td colSpan={3}></td>
           </tr>
         ) : (
-          exercises.map((exercise) =>
+          sorted.map((exercise) =>
             <ExerciseRow exercise={exercise} key={exercise._id} onDelete={onDelete} onEdit={onEdit} onDuplicate={onDuplicate} onView={onView}/>)
         )}
         </tbody>

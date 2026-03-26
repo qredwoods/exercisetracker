@@ -265,6 +265,11 @@ tr td {
   border-color: rgba(186, 78, 66, 0.833);
 }
 
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+}
+
 tbody tr {
   transition: background 0.15s ease;
 }
