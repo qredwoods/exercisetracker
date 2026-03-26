@@ -113,9 +113,18 @@ jobs:
           npm ci --prefix e2e &
           wait
 
-      # Install Playwright's Chromium browser
-      - run: npx playwright install chromium --with-deps
+      # Cache Playwright browser binary across runs
+      - id: playwright-version
+        run: echo "version=$(npx --prefix e2e playwright --version)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
+      - if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
         working-directory: e2e
+      - run: npx playwright install-deps chromium
 
       # Start backend and frontend in the background
       - run: node controller.mjs &
