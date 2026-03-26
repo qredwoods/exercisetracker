@@ -1,0 +1,160 @@
+name: Backend CI/CD
+
+# --- TRIGGER ---
+# Runs on pushes to main that touch backend code or this workflow itself.
+# Ignores markdown files — README changes shouldn't trigger a deploy.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+      - "!backend/**.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+      - "!backend/**.md"
+
+# --- PERMISSIONS ---
+# The OIDC token request needs `id-token: write`.
+# `contents: read` lets the runner clone the repo.
+permissions:
+  id-token: write
+  contents: read
+
+# --- JOBS ---
+jobs:
+  # ── Unit & integration tests ──────────────────────────────────
+  test:
+    name: Backend tests
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+        working-directory: backend
+
+      - run: npm test
+        working-directory: backend
+
+  # ── E2E tests (Playwright) ───────────────────────────────────
+  e2e:
+    name: E2E tests
+    runs-on: ubuntu-24.04-arm
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            e2e/package-lock.json
+
+      # Install all three packages in parallel
+      - run: |
+          npm ci --prefix backend &
+          npm ci --prefix frontend &
+          npm ci --prefix e2e &
+          wait
+
+      # Install Playwright's Chromium browser
+      - run: npx playwright install chromium --with-deps
+        working-directory: e2e
+
+      # Start backend and frontend in the background
+      - run: node controller.mjs &
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          PORT: 3000
+          MONGODB_URI: mongodb://localhost:27017/exercisetracker-test
+          ACCESS_TOKEN_SECRET: test-access-secret
+          REFRESH_TOKEN_SECRET: test-refresh-secret
+          CORS_ORIGIN: http://localhost:5173
+
+      - run: npx vite --port 5173 &
+        working-directory: frontend
+
+      # Wait for both servers to be ready
+      - run: |
+          npx wait-on http://localhost:3000/health http://localhost:5173 --timeout 30000
+
+      - run: npm test
+        working-directory: e2e
+
+  # ── Build, push, deploy ──────────────────────────────────────
+  deploy:
+    name: Deploy to AWS
+    if: github.event_name == 'push'
+    needs: [test, e2e]
+    runs-on: ubuntu-24.04-arm
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      # Authenticate to AWS via OIDC — no stored access keys.
+      # This action exchanges GitHub's OIDC token for temporary
+      # AWS credentials scoped to the github-actions-deploy role.
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # Authenticate Docker to ECR so we can push images.
+      # Returns the registry URL as an output for the next step.
+      - id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Build and push the Docker image.
+      # Tags with both the git SHA (immutable, for traceability)
+      # and "latest" (so the ASG launch template always pulls current).
+      - run: |
+          docker build \
+            -t ${{ steps.ecr-login.outputs.registry }}/exercisetracker-api:${{ github.sha }} \
+            -t ${{ steps.ecr-login.outputs.registry }}/exercisetracker-api:latest \
+            backend/
+      - run: |
+          docker push ${{ steps.ecr-login.outputs.registry }}/exercisetracker-api --all-tags
+
+      # Trigger a rolling replacement of ASG instances.
+      # New instances boot with the latest image via the launch template's user data.
+      - run: |
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name exercisetracker-asg \
+            --preferences '{"MinHealthyPercentage":100}'
+
+      # Wait for the refresh to complete (checks every 15s, up to 10 min).
+      - run: |
+          echo "Waiting for instance refresh to complete..."
+          for i in $(seq 1 40); do
+            STATUS=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name exercisetracker-asg \
+              --query 'InstanceRefreshes[0].Status' --output text)
+            echo "  Attempt $i: $STATUS"
+            if [ "$STATUS" = "Successful" ]; then exit 0; fi
+            if [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Cancelled" ]; then exit 1; fi
+            sleep 15
+          done
+          echo "Timed out waiting for instance refresh"
+          exit 1
+
+      # Smoke test — verify the new instance is serving traffic.
+      - run: |
+          sleep 10
+          curl -f --retry 3 --retry-delay 5 https://api.sparkmvmt.com/health
