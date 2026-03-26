@@ -99,7 +99,7 @@ if (authLoading) {
             <span className="site-title">SparkMvmt</span>
           )}
         </h1>
-        <p>track exercises, energize your life</p>
+        <p className="tagline">track exercises, energize your life</p>
       </header>
 
       {!user ? (

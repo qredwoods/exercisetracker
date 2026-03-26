@@ -26,10 +26,14 @@ button {
 }
 
 h1 {
-  font-size: 2.6em;
+  font-size: 2.5em;
   font-weight: 500;
   line-height: 1.1;
   color: inherit;
+}
+
+.tagline {
+  font-size: 0.8rem;
 }
 
 a {
@@ -239,6 +243,7 @@ a.site-title:hover {
 
 
 table {
+  font-size: 1.05rem;
   width: min(1100px, 100%);
   margin: 1rem auto;
   margin-top: 0.75rem;
@@ -265,6 +270,8 @@ tr td {
 tr td {
   border-color: rgba(186, 78, 66, 0.833);
 }
+
+
 
 .sortable-th {
   cursor: pointer;
