@@ -210,6 +210,8 @@ jobs:
 
       - run: npm run build
         working-directory: frontend
+        env:
+          VITE_API_URL: https://api.sparkmvmt.com
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
