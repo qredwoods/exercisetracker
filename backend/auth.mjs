@@ -157,25 +157,25 @@ router.post('/login', async (req, res) => {
 
 // ── refresh ─────────────────────────────────────────────
 router.post('/refresh', async (req, res) => {
+  const token = req.cookies?.refreshToken;
+
+  if (!token) {
+    return res.status(401).json({ error: 'No refresh token.' });
+  }
+
+  let payload;
   try {
-    const token = req.cookies?.refreshToken;
-
-    if (!token) {
-      return res.status(401).json({ error: 'No refresh token.' });
-    }
-
-    const payload = jwt.verify(token, REFRESH_TOKEN_SECRET);
-
-    // rotate: issue new pair
-    const accessToken = signAccessToken(payload.userId);
-    const refreshToken = signRefreshToken(payload.userId);
-    setRefreshCookie(res, refreshToken);
-
-    res.status(200).json({ accessToken });
-  } catch (err) {
-    // expired or tampered
+    payload = jwt.verify(token, REFRESH_TOKEN_SECRET);
+  } catch {
     return res.status(401).json({ error: 'Invalid refresh token.' });
   }
+
+  // rotate: issue new pair
+  const accessToken = signAccessToken(payload.userId);
+  const refreshToken = signRefreshToken(payload.userId);
+  setRefreshCookie(res, refreshToken);
+
+  res.status(200).json({ accessToken });
 });
 
 // ── demo ───────────────────────────────────────────────
