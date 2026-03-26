@@ -23,6 +23,8 @@ const ExerciseFormPage = ({ setExercises, exerciseDraft, setExerciseDraft, showT
     return true;
   });
 
+  const { formError, showError, clearError, zoneClass } = useFormError();
+
   const heading = isEdit
     ? "Make a change"
     : isDuplicate
@@ -73,8 +75,6 @@ const ExerciseFormPage = ({ setExercises, exerciseDraft, setExerciseDraft, showT
       </div>
     );
   }
-
-  const { formError, showError, clearError, zoneClass } = useFormError();
 
   return (
     <div>
