@@ -4,11 +4,9 @@
 
 Full-stack exercise tracker where users log, edit, duplicate, and delete workouts through a responsive single-page UI. One-click demo mode lets anyone try it instantly.
 
-React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. Secrets via SSM Parameter Store, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, and an automated test suite.
+React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. Secrets via SSM Parameter Store, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, 120 automated tests, and CI/CD via GitHub Actions.
 
-**Just added:** 120 tests — 91 backend (node:test + supertest + mongodb-memory-server) and 29 E2E (Playwright).
-
-**Up next:** CI/CD via GitHub Actions (test → build → push to ECR → rolling ASG deploy), exercise autocomplete + filtering, and LLM-powered coaching.
+**Just added:** CI/CD pipeline — unified GitHub Actions workflow with change detection, OIDC auth to AWS, native ARM Docker builds, and zero-downtime rolling deploys.
 
 ## Architecture
 
@@ -33,7 +31,8 @@ api.sparkmvmt.com →  │    ALB (ACM TLS termination)     │
                      │         MongoDB Atlas            │
                      └──────────────────────────────────┘
 
-Deploy: docker build → push to ECR → ASG instances pull on boot
+CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling deploy
+       Frontend: lint → E2E → S3 sync → CloudFront invalidation
 ```
 
 - **Frontend:** Vite + React SPA deployed to S3, served via CloudFront
@@ -84,6 +83,7 @@ Deploy: docker build → push to ECR → ASG instances pull on boot
 - Graceful shutdown on SIGTERM for zero-downtime container deploys
 - ECR image pipeline with IAM instance role authentication
 - 120 automated tests: 91 backend (node:test + supertest + mongodb-memory-server) and 29 E2E (Playwright)
+- CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, native ARM builds with Docker layer caching, zero-downtime ASG instance refresh, post-deploy smoke test
 
 ---
 
@@ -113,6 +113,8 @@ Deploy: docker build → push to ECR → ASG instances pull on boot
 │   ├── compose.yaml          # Local container testing
 │   ├── k6-benchmark.js      # k6 load test script
 │   └── user-data.sh         # EC2 bootstrap: pull image from ECR, fetch secrets from SSM
+├── .github/workflows/
+│   └── ci.yml              # Unified CI/CD: change detection, test, build, deploy
 ├── e2e/
 │   ├── tests/               # Playwright E2E tests (29 tests)
 │   │   ├── auth.spec.mjs    # Auth flows, demo mode, session restore
@@ -156,19 +158,28 @@ The included `test-requests.http` file covers all endpoints. Use the [REST Clien
 
 ## Production Deployment
 
-### Frontend (S3 + CloudFront)
+Merging to `main` triggers automated deployment via GitHub Actions (`ci.yml`).
 
-1. Build the frontend: `cd frontend && npm run build`
-2. Sync `dist/` to your S3 bucket (static website hosting enabled)
-3. CloudFront distribution points to the S3 origin with `index.html` as the default root object and error page (for SPA routing)
-4. `sparkmvmt.com` DNS points to the CloudFront distribution
+### Pipeline Flow
 
-### Backend (ALB + ASG + Docker + ECR)
+```
+push/PR → change detection → backend tests (if changed)
+                            → frontend lint (if changed)
+                            → E2E tests (always)
+                            → deploy backend (if changed, push only)
+                            → deploy frontend (if changed, push only)
+```
 
-1. Build and push the Docker image: `docker build` → `docker push` to ECR
-2. ASG launches EC2 instances from a launch template with user data that pulls the image from ECR and fetches secrets from SSM Parameter Store
-3. ALB terminates TLS (ACM cert), routes traffic to healthy instances via target group health checks on `/health`
-4. Auto Scaling Group maintains 1-3 instances based on CPU utilization
+- **Auth:** GitHub OIDC → AWS STS temporary credentials (no stored access keys)
+- **Backend deploy:** Native ARM Docker build with layer caching → ECR push → ASG instance refresh (zero-downtime) → smoke test
+- **Frontend deploy:** Vite build → S3 sync → CloudFront invalidation
+
+### Infrastructure
+
+- **Frontend:** S3 bucket + CloudFront CDN, `sparkmvmt.com` DNS via bunny.net
+- **Backend:** ALB terminates TLS (ACM cert), routes to ASG (1-3 EC2 t4g.small instances), health checks on `/health`
+- **Secrets:** SSM Parameter Store (fetched by EC2 user data on boot)
+- **Images:** ECR with dual tagging (git SHA + latest)
 
 ### Environment Variables (Production)
 
@@ -200,7 +211,6 @@ Button elements for all actions, `aria-label` on icon buttons, preserved focus s
 
 ## Roadmap
 
-- CI/CD pipeline (GitHub Actions → test → ECR → ASG rolling deploy)
 - Email verification and password reset (SES or SendGrid)
 - Exercise name autocomplete
 - Workout grouping (multiple exercises per session)
