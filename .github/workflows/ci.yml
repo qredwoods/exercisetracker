@@ -141,8 +141,8 @@ jobs:
   # ── Deploy backend ─────────────────────────────────────────
   deploy-backend:
     name: Deploy backend
-    if: github.event_name == 'push' && needs.changes.outputs.backend == 'true'
     needs: [e2e, changes]
+    if: ${{ !failure() && !cancelled() && github.event_name == 'push' && needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-24.04-arm
     environment: production
     steps:
@@ -192,8 +192,8 @@ jobs:
   # ── Deploy frontend ────────────────────────────────────────
   deploy-frontend:
     name: Deploy frontend
-    if: github.event_name == 'push' && needs.changes.outputs.frontend == 'true'
     needs: [e2e, changes]
+    if: ${{ !failure() && !cancelled() && github.event_name == 'push' && needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-24.04-arm
     environment: production
     steps:
