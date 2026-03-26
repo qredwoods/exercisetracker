@@ -95,4 +95,8 @@ async function disconnect() {
   console.log("Disconnected from MongoDB.");
 }
 
-export {connect, disconnect, Exercise, createExercise, deleteExercises, findExercises, deleteById, findExerciseById, updateExercise}
+function isDbConnected() {
+  return mongoose.connection.readyState === 1;
+}
+
+export {connect, disconnect, isDbConnected, Exercise, createExercise, deleteExercises, findExercises, deleteById, findExerciseById, updateExercise}

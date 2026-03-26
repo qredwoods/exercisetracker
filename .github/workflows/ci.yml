@@ -170,6 +170,16 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
+      # Save current latest digest so we can rollback if smoke test fails
+      - id: prev-image
+        run: |
+          DIGEST=$(aws ecr describe-images \
+            --repository-name exercisetracker-api \
+            --image-ids imageTag=latest \
+            --query 'imageDetails[0].imageDigest' --output text 2>/dev/null || echo "none")
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "Previous latest digest: $DIGEST"
+
       - run: |
           docker buildx build \
             --cache-from type=gha \
@@ -182,12 +192,14 @@ jobs:
       - run: |
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name exercisetracker-asg \
-            --preferences '{"MinHealthyPercentage":100}'
+            --preferences '{"MinHealthyPercentage":100,"AutoRollback":true}'
 
-      # Wait for the refresh to complete (checks every 15s, up to 10 min).
+      # Wait for the refresh to complete (3 min initial wait, then poll every 15s, up to 10 min total).
       - run: |
-          echo "Waiting for instance refresh to complete..."
-          for i in $(seq 1 40); do
+          echo "Waiting 3 minutes for instance to boot..."
+          sleep 180
+          echo "Polling for instance refresh status..."
+          for i in $(seq 1 28); do
             STATUS=$(aws autoscaling describe-instance-refreshes \
               --auto-scaling-group-name exercisetracker-asg \
               --query 'InstanceRefreshes[0].Status' --output text)
@@ -199,10 +211,52 @@ jobs:
           echo "Timed out waiting for instance refresh"
           exit 1
 
-      # Smoke test — verify the new instance is serving traffic.
+      # Smoke test — verify health, demo creation (DB + auth), and authenticated read.
       - run: |
           sleep 10
+          echo "=== Health check ==="
           curl -f --retry 3 --retry-delay 5 https://api.sparkmvmt.com/health
+
+          echo ""
+          echo "=== Demo account creation ==="
+          DEMO=$(curl -sf --retry 2 --retry-delay 5 -X POST https://api.sparkmvmt.com/api/auth/demo)
+          TOKEN=$(echo "$DEMO" | jq -r '.accessToken')
+          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+            echo "Failed to create demo account"
+            exit 1
+          fi
+          echo "Demo account created successfully"
+
+          echo ""
+          echo "=== Authenticated exercise fetch ==="
+          COUNT=$(curl -sf --retry 2 --retry-delay 5 -H "Authorization: Bearer $TOKEN" https://api.sparkmvmt.com/api/exercises | jq 'length')
+          if [ "$COUNT" -lt 1 ]; then
+            echo "Expected seeded exercises, got $COUNT"
+            exit 1
+          fi
+          echo "Fetched $COUNT exercises — smoke test passed"
+
+      # Rollback — re-tag previous image as latest and refresh ASG
+      - if: failure() && steps.prev-image.outputs.digest != 'none'
+        run: |
+          PREV=${{ steps.prev-image.outputs.digest }}
+          echo "Rolling back to previous image: $PREV"
+
+          MANIFEST=$(aws ecr batch-get-image \
+            --repository-name exercisetracker-api \
+            --image-ids imageDigest="$PREV" \
+            --query 'images[0].imageManifest' --output text)
+
+          aws ecr put-image \
+            --repository-name exercisetracker-api \
+            --image-tag latest \
+            --image-manifest "$MANIFEST"
+
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name exercisetracker-asg \
+            --preferences '{"MinHealthyPercentage":100,"AutoRollback":true}'
+
+          echo "Rollback instance refresh started"
 
   # ── Deploy frontend ────────────────────────────────────────
   deploy-frontend:

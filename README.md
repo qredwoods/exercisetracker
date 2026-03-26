@@ -80,10 +80,11 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 - Rate limiting on auth endpoints, helmet security headers, query parameter whitelisting against NoSQL injection
 - Dockerized backend with multi-stage builds (argon2 native compilation in builder, slim production image)
 - Express 5 with native async error propagation and central error middleware
+- DB-aware health check (`/health` verifies MongoDB connection) — ALB auto-replaces unhealthy instances
 - Graceful shutdown on SIGTERM for zero-downtime container deploys
 - ECR image pipeline with IAM instance role authentication
 - 120 automated tests: 91 backend (node:test + supertest + mongodb-memory-server) and 29 E2E (Playwright)
-- CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, native ARM builds with Docker layer caching, zero-downtime ASG instance refresh, post-deploy smoke test
+- CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, native ARM builds with Docker layer caching, zero-downtime ASG instance refresh with auto-rollback, post-deploy smoke test
 
 ---
 
@@ -171,7 +172,7 @@ push/PR → change detection → backend tests (if changed)
 ```
 
 - **Auth:** GitHub OIDC → AWS STS temporary credentials (no stored access keys)
-- **Backend deploy:** Native ARM Docker build with layer caching → ECR push → ASG instance refresh (zero-downtime) → smoke test
+- **Backend deploy:** Native ARM Docker build with layer caching → ECR push → ASG instance refresh (zero-downtime, auto-rollback) → smoke test (demo creation + authenticated read) → automatic rollback on failure
 - **Frontend deploy:** Vite build → S3 sync → CloudFront invalidation
 
 ### Infrastructure

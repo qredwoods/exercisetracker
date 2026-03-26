@@ -149,8 +149,11 @@ function validateExerciseBody(body) {
   };
 }
 
-// health check (public)
+// health check (public) — ALB uses this to determine instance health
 app.get("/health", async (_, res) => {
+  if (!model.isDbConnected()) {
+    return res.status(503).json({ status: "degraded", db: "disconnected" });
+  }
   res.status(200).json({ status: "ok" });
 });
 
