@@ -8,6 +8,7 @@
     "test:ui": "npx playwright test --ui"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.2"
+    "@playwright/test": "^1.58.2",
+    "wait-on": "^9.0.4"
   }
 }
