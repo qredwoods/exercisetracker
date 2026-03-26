@@ -24,16 +24,22 @@ function formatDisplayDate(dateString) {
   </>;
 }
 
-const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView }) => {
+const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView, highlight, onHighlightEnd, deleting, flashField }) => {
   const { name, reps, weight, unit, date, _id } = exercise;
   const isBodyweight = unit === "bodyweight";
 
+  const className = [
+    "clickable-row",
+    highlight ? "row-highlight" : "",
+    deleting ? "row-deleting" : "",
+  ].filter(Boolean).join(" ");
+
   return (
-    <tr className="clickable-row" onClick={() => onView(exercise)}>
-      <td>{name}</td>
+    <tr className={className} onClick={() => onView(exercise)} onAnimationEnd={highlight ? onHighlightEnd : undefined}>
+      <td className={flashField === "name" ? "sort-col-flash" : ""}>{name}</td>
       <td>{reps}</td>
       <td>{isBodyweight ? "BW" : `${weight} ${unit}`}</td>
-      <td>{formatDisplayDate(date)}</td>
+      <td className={flashField === "date" ? "sort-col-flash" : ""}>{formatDisplayDate(date)}</td>
 
       <td onClick={(e) => e.stopPropagation()}>
         <button

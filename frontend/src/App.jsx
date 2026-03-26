@@ -16,6 +16,7 @@ function App() {
   const [exercisesLoading, setExercisesLoading] = useState(false);
   const [justLoggedIn, setJustLoggedIn] = useState(false);
   const [exerciseDraft, setExerciseDraft] = useState(null);
+  const [highlightId, setHighlightId] = useState(null);
   const [toast, setToast] = useState(null);
   const showToast = useCallback((message) => setToast(message), []);
   const [isFirstVisit, setIsFirstVisit] = useState(() => {
@@ -123,6 +124,8 @@ if (authLoading) {
               isFirstVisit={isFirstVisit}
               justLoggedIn={justLoggedIn}
               onFadeComplete={() => setJustLoggedIn(false)}
+              highlightId={highlightId}
+              setHighlightId={setHighlightId}
             />
           }
         />
@@ -134,6 +137,7 @@ if (authLoading) {
               exerciseDraft={exerciseDraft}
               setExerciseDraft={setExerciseDraft}
               showToast={showToast}
+              setHighlightId={setHighlightId}
             />
           }
         />
@@ -145,6 +149,7 @@ if (authLoading) {
               exerciseDraft={exerciseDraft}
               setExerciseDraft={setExerciseDraft}
               showToast={showToast}
+              setHighlightId={setHighlightId}
             />
           }
         />

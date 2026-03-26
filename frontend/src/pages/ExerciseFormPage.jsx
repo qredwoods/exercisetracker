@@ -6,7 +6,7 @@ import ExerciseForm from "../components/ExerciseForm";
 import useFormError from "../utils/useFormError";
 import ConfirmOverlay from "../components/ConfirmOverlay";
 
-const ExerciseFormPage = ({ setExercises, exerciseDraft, setExerciseDraft, showToast }) => {
+const ExerciseFormPage = ({ setExercises, exerciseDraft, setExerciseDraft, showToast, setHighlightId }) => {
   const navigate = useNavigate();
   const addAnotherRef = useRef(false);
   const formResetRef = useRef(null);
@@ -48,6 +48,7 @@ const ExerciseFormPage = ({ setExercises, exerciseDraft, setExerciseDraft, showT
           body: JSON.stringify(exercise),
         });
         setExercises((prev) => [...prev, created]);
+        setHighlightId(created._id);
 
         if (addAnotherRef.current) {
           addAnotherRef.current = false;

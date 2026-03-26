@@ -7,10 +7,11 @@ import { flushSync } from "react-dom";
 import { apiFetch } from "../utils/api";
 import { todayIsoLocal } from "../utils/date";
 
-function HomePage({ user, exercises, exercisesLoading, setExercises, setExerciseDraft, showToast, isFirstVisit, justLoggedIn, onFadeComplete }) {
+function HomePage({ user, exercises, exercisesLoading, setExercises, setExerciseDraft, showToast, isFirstVisit, justLoggedIn, onFadeComplete, highlightId, setHighlightId }) {
   const navigate = useNavigate();
   const today = todayIsoLocal();
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const onDeleteRequest = (_id) => {
     const exercise = exercises.find((e) => e._id === _id);
@@ -18,13 +19,18 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
   };
 
   const onDeleteConfirm = async () => {
+    const id = deleteTarget._id;
+    setDeleteTarget(null);
     try {
-      await apiFetch(`/api/exercises/${deleteTarget._id}`, { method: "DELETE" });
-      setExercises((prev) => prev.filter((e) => e._id !== deleteTarget._id));
+      await apiFetch(`/api/exercises/${id}`, { method: "DELETE" });
+      setDeletingId(id);
+      setTimeout(() => {
+        setExercises((prev) => prev.filter((e) => e._id !== id));
+        setDeletingId(null);
+      }, 1000);
     } catch (err) {
       showToast(err.message);
     }
-    setDeleteTarget(null);
   };
 
   const onEdit = (exerciseDraft) => {
@@ -67,6 +73,9 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
         isFirstVisit={isFirstVisit}
         fadeIn={justLoggedIn}
         onFadeComplete={onFadeComplete}
+        highlightId={highlightId}
+        onHighlightEnd={() => setHighlightId(null)}
+        deletingId={deletingId}
       />
 
       <div className="cta-row-fixed">
