@@ -3,15 +3,11 @@ const API_BASE = import.meta.env.VITE_API_URL || "";
 // ── token storage (in-memory, not localStorage) ─────────
 let accessToken = null;
 
-export function setAccessToken(token) {
+function setAccessToken(token) {
   accessToken = token;
 }
 
-export function getAccessToken() {
-  return accessToken;
-}
-
-export function clearAccessToken() {
+function clearAccessToken() {
   accessToken = null;
 }
 
@@ -115,7 +111,7 @@ export async function logout() {
   }
 }
 
-export async function fetchMe() {
+async function fetchMe() {
   const data = await apiFetch("/api/auth/me");
   return data.user;
 }

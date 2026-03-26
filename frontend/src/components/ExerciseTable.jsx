@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import ExerciseRow, { formatDisplayDate } from './ExerciseRow'
 
 const EXAMPLE_ROW = {
@@ -33,7 +34,7 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, 
               className="sortable-th"
               onClick={() => setSortOrder(s => s === "newest" ? "oldest" : "newest")}
             >
-              Date {sortOrder === "newest" ? "↓" : "↑"}
+              Date {sortOrder === "newest" ? <FiChevronDown /> : <FiChevronUp />}
             </th>
             <th colSpan={3}>Actions</th>
           </tr>

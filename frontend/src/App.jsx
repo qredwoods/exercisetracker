@@ -51,7 +51,6 @@ function App() {
       const data = await apiFetch("/api/exercises");
       setExercises(data);
     } catch (err) {
-      console.error("Failed to load exercises:", err);
       if (err.status === 401) {
         setUser(null);
       }
