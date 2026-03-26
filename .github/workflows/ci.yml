@@ -1,34 +1,47 @@
-name: Backend CI/CD
+name: CI/CD
 
-# --- TRIGGER ---
-# Runs on pushes to main that touch backend code or this workflow itself.
-# Ignores markdown files — README changes shouldn't trigger a deploy.
 on:
   push:
     branches: [main]
     paths:
       - "backend/**"
-      - ".github/workflows/backend.yml"
-      - "!backend/**.md"
+      - "frontend/**"
+      - "e2e/**"
+      - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
     paths:
       - "backend/**"
-      - ".github/workflows/backend.yml"
-      - "!backend/**.md"
+      - "frontend/**"
+      - "e2e/**"
+      - ".github/workflows/ci.yml"
 
-# --- PERMISSIONS ---
-# The OIDC token request needs `id-token: write`.
-# `contents: read` lets the runner clone the repo.
 permissions:
   id-token: write
   contents: read
 
-# --- JOBS ---
 jobs:
-  # ── Unit & integration tests ──────────────────────────────────
+  # ── Detect what changed ────────────────────────────────────
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend: backend/**
+            frontend: frontend/**
+
+  # ── Backend unit & integration tests ───────────────────────
   test:
     name: Backend tests
+    needs: [changes]
+    if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
@@ -45,9 +58,34 @@ jobs:
       - run: npm test
         working-directory: backend
 
-  # ── E2E tests (Playwright) ───────────────────────────────────
+  # ── Frontend lint ──────────────────────────────────────────
+  lint:
+    name: Lint
+    needs: [changes]
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+        working-directory: frontend
+
+      - run: npm run lint
+        working-directory: frontend
+
+  # ── E2E tests (Playwright) ────────────────────────────────
+  # Always runs — tests the contract between frontend and backend.
+  # Waits for fast checks to pass first to avoid wasting runner time.
   e2e:
     name: E2E tests
+    needs: [test, lint]
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-24.04-arm
     services:
       mongo:
@@ -98,32 +136,24 @@ jobs:
       - run: npm test
         working-directory: e2e
 
-  # ── Build, push, deploy ──────────────────────────────────────
-  deploy:
-    name: Deploy to AWS
-    if: github.event_name == 'push'
-    needs: [test, e2e]
+  # ── Deploy backend ─────────────────────────────────────────
+  deploy-backend:
+    name: Deploy backend
+    if: github.event_name == 'push' && needs.changes.outputs.backend == 'true'
+    needs: [e2e, changes]
     runs-on: ubuntu-24.04-arm
     environment: production
     steps:
       - uses: actions/checkout@v4
 
-      # Authenticate to AWS via OIDC — no stored access keys.
-      # This action exchanges GitHub's OIDC token for temporary
-      # AWS credentials scoped to the github-actions-deploy role.
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      # Authenticate Docker to ECR so we can push images.
-      # Returns the registry URL as an output for the next step.
       - id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Build and push the Docker image.
-      # Tags with both the git SHA (immutable, for traceability)
-      # and "latest" (so the ASG launch template always pulls current).
       - run: |
           docker build \
             -t ${{ steps.ecr-login.outputs.registry }}/exercisetracker-api:${{ github.sha }} \
@@ -132,8 +162,6 @@ jobs:
       - run: |
           docker push ${{ steps.ecr-login.outputs.registry }}/exercisetracker-api --all-tags
 
-      # Trigger a rolling replacement of ASG instances.
-      # New instances boot with the latest image via the launch template's user data.
       - run: |
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name exercisetracker-asg \
@@ -158,3 +186,38 @@ jobs:
       - run: |
           sleep 10
           curl -f --retry 3 --retry-delay 5 https://api.sparkmvmt.com/health
+
+  # ── Deploy frontend ────────────────────────────────────────
+  deploy-frontend:
+    name: Deploy frontend
+    if: github.event_name == 'push' && needs.changes.outputs.frontend == 'true'
+    needs: [e2e, changes]
+    runs-on: ubuntu-24.04-arm
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+        working-directory: frontend
+
+      - run: npm run build
+        working-directory: frontend
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - run: |
+          aws s3 sync frontend/dist/ s3://${{ secrets.S3_BUCKET }} --delete
+
+      - run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
