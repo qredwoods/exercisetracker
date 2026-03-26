@@ -35,34 +35,34 @@ const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView }) => {
       <td>{isBodyweight ? "BW" : `${weight} ${unit}`}</td>
       <td>{formatDisplayDate(date)}</td>
 
-      <td>
+      <td onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           className="icon-button"
           aria-label={`Edit ${name}`}
-          onClick={(e) => { e.stopPropagation(); onEdit(exercise); }}
+          onClick={() => onEdit(exercise)}
         >
           <FiEdit3 />
         </button>
       </td>
 
-      <td>
+      <td onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           className="icon-button"
           aria-label={`Duplicate ${name}`}
-          onClick={(e) => { e.stopPropagation(); onDuplicate(exercise); }}
+          onClick={() => onDuplicate(exercise)}
         >
           <FiCopy />
         </button>
       </td>
 
-      <td>
+      <td onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           className="icon-button"
           aria-label={`Delete ${name}`}
-          onClick={(e) => { e.stopPropagation(); onDelete(_id); }}
+          onClick={() => onDelete(_id)}
         >
           <TiDeleteOutline />
         </button>
