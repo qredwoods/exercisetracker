@@ -45,7 +45,7 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, 
         <div className="empty-hint" style={{ marginTop: "2rem" }}>
           <p className="welcome-line">Welcome{user?.firstName ? `, ${user.firstName}` : ""}.</p>
           <p>This is your <span className="underline-reveal">exercise log</span> — everything you track shows up here.</p>
-          <p>Let's get started!</p>
+          <p>Let&apos;s get started!</p>
         </div>
       )}
       {isEmpty && !showWelcome && (

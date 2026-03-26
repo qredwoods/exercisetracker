@@ -1,0 +1,82 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+      - "!frontend/**.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+      - "!frontend/**.md"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ── Lint ────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+        working-directory: frontend
+
+      - run: npm run lint
+        working-directory: frontend
+
+  # ── Build & deploy ─────────────────────────────────────────
+  deploy:
+    name: Deploy to S3/CloudFront
+    if: github.event_name == 'push'
+    needs: [lint]
+    runs-on: ubuntu-24.04-arm
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+        working-directory: frontend
+
+      # Build the production bundle.
+      # Vite outputs to frontend/dist/.
+      - run: npm run build
+        working-directory: frontend
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # Sync build output to S3.
+      # --delete removes files from S3 that no longer exist in dist/,
+      # so stale assets from previous deploys are cleaned up.
+      - run: |
+          aws s3 sync frontend/dist/ s3://${{ secrets.S3_BUCKET }} --delete
+
+      # Invalidate CloudFront's cache so users get the new files immediately.
+      # "/*" means invalidate everything — simpler than tracking which files changed.
+      # CloudFront gives you 1,000 free invalidation paths per month.
+      - run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
