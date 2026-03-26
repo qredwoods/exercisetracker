@@ -97,7 +97,7 @@ const ExerciseFormPage = ({ setExercises, exerciseDraft, setExerciseDraft, showT
 
       <div className="cta-row">
         <div className="dual-btn">
-          <button className="back-btn" onClick={() => {
+          <button className="cta-button cta-button--icon" onClick={() => {
             if (formDirtyRef.current?.()) { setShowDiscard(true); return; }
             navigate("/");
           }} aria-label="Back" data-tooltip="Back">
