@@ -38,7 +38,7 @@ const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView, highligh
     <tr className={className} onClick={() => onView(exercise)} onAnimationEnd={highlight ? onHighlightEnd : undefined}>
       <td className={flashField === "name" ? "sort-col-flash" : ""}>{name}</td>
       <td>{reps}</td>
-      <td>{isBodyweight ? "BW" : `${weight} ${unit}`}</td>
+      <td>{isBodyweight ? "BW" : <>{weight}<span className="unit-label" data-short={unit.slice(0, -1)}> {unit}</span></>}</td>
       <td className={flashField === "date" ? "sort-col-flash" : ""}>{formatDisplayDate(date)}</td>
 
       <td onClick={(e) => e.stopPropagation()}>

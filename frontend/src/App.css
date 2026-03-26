@@ -479,7 +479,7 @@ footer .copyright {
 .exercise-form {
   width: min(1100px, 100%);
   max-width: min(92vw, 100vw - 6em - 2rem);
-  margin: 1rem;
+  margin: 1rem auto;
   margin-top: .6rem;
   padding: 20px;
   display: flex;
@@ -999,6 +999,14 @@ footer .copyright {
   }
   .date-numeric {
     display: inline;
+  }
+  .unit-label {
+    font-size: 0;
+  }
+  .unit-label::before {
+    font-size: 0.75rem;
+    content: attr(data-short);
+    margin-left: 2px;
   }
 }
 
