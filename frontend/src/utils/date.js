@@ -6,18 +6,4 @@ export function todayIsoLocal() {
   return `${year}-${month}-${day}`;
 }
 
-export function formatDisplayDate(dateString) {
-  const [year, month, day] = dateString.split("-");
-
-  const date = new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day)
-  );
-
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+// TODO: consolidate formatDisplayDate here from ExerciseRow.jsx
