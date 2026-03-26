@@ -121,7 +121,7 @@ export default function LoginPage({ onAuth }) {
 
         {error && <div className="auth-error">{error}</div>}
 
-        <div className="auth-form">
+        <form className="auth-form" onSubmit={handleSubmit}>
           {isSignup && (
             <div className="name-row">
               <input
@@ -242,7 +242,7 @@ export default function LoginPage({ onAuth }) {
           )}
           <button
             className="auth-submit"
-            onClick={handleSubmit}
+            type="submit"
             disabled={loading}
           >
             {loading
@@ -251,7 +251,7 @@ export default function LoginPage({ onAuth }) {
               ? "Sign Up"
               : "Log In"}
           </button>
-        </div>
+        </form>
 
         <p className="auth-toggle">
           {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
