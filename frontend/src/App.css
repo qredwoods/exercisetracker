@@ -1030,16 +1030,8 @@ footer .copyright {
     margin-bottom: -2rem;
   }
 
-  .name-row {
-    flex-direction: column;
-  }
-
   .auth-page {
     margin: 0 -0.5em;
-  }
-
-  .auth-card {
-    max-width: 100vw;
   }
 }
 
@@ -1125,7 +1117,7 @@ footer .copyright {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
   padding: 2rem 1.5rem;
   width: 100%;
-  max-width: min(400px, 100vw - 6em - 2rem);
+  max-width: min(400px, 100vw - 3em);
   text-align: center;
   box-sizing: border-box;
 }
