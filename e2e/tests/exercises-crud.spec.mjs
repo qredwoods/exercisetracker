@@ -124,7 +124,7 @@ test.describe('Exercise CRUD', () => {
     await expect(page.locator(SEL.detailName)).toContainText('Squat');
 
     // Back button returns to home
-    await page.click('.back-btn');
+    await page.click('[aria-label="Back"]');
     await expect(page.locator('table')).toBeVisible();
   });
 
@@ -193,7 +193,7 @@ test.describe('Exercise CRUD', () => {
     await page.fill(SEL.formName, 'Squat');
 
     // Click back
-    await page.click('.back-btn');
+    await page.click('[aria-label="Back"]');
     await page.waitForSelector(SEL.overlay);
     await expect(page.locator('.overlay-card')).toContainText('Discard unsaved changes?');
 
@@ -210,7 +210,7 @@ test.describe('Exercise CRUD', () => {
     await page.fill(SEL.formName, 'Squat');
 
     // Click back, then confirm discard
-    await page.click('.back-btn');
+    await page.click('[aria-label="Back"]');
     await page.waitForSelector(SEL.overlay);
     await page.click(SEL.overlayConfirm);
 

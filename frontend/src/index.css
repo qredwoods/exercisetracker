@@ -6,6 +6,34 @@
 
   color: rgba(229, 237, 113, 0.87);
 
+  /* Text colors */
+  --color-text: rgb(160, 219, 160);
+  --color-text-accent: #b7e4a8;
+  --color-text-hover: #d9f99d;
+  --color-text-muted: rgba(255, 255, 255, 0.5);
+  --color-text-label: #cbd5e1;
+  --color-text-placeholder: #64748b;
+  --color-text-warm: #e8edd5;
+
+  /* Borders */
+  --color-border-salmon: rgba(186, 78, 66, 0.833);
+  --color-border-salmon-light: rgba(250, 128, 114, 0.751);
+  --color-border-salmon-subtle: rgba(250, 128, 114, 0.4);
+  --color-border-lime: rgba(163, 230, 53, 0.22);
+  --color-border-lime-hover: rgba(163, 230, 53, 0.42);
+  --color-border-focus: rgba(255, 255, 255, 0.22);
+
+  /* Surfaces */
+  --color-card-bg: rgba(255, 255, 255, 0.08);
+  --color-card-border: rgba(255, 255, 255, 0.18);
+
+  /* Shared component values */
+  --radius-card: 18px;
+  --radius-button: 8px;
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.22);
+  --shadow-hover: 0 14px 30px rgba(0, 0, 0, 0.34);
+  --focus-glow: 0 0 0 1px rgba(163, 230, 53, 0.18);
+  --btn-min-height: 52px;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

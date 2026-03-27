@@ -93,7 +93,7 @@ const ExerciseDetailPage = ({ exerciseDraft, setExerciseDraft, setExercises, sho
       </div>
 
       <div className="cta-row">
-        <button className="back-btn" onClick={() => navigate("/")}>
+        <button className="cta-button cta-button--icon" onClick={() => navigate("/")} aria-label="Back">
           <FiArrowLeft />
         </button>
       </div>
