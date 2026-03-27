@@ -6,8 +6,6 @@ Full-stack exercise tracker where users log, edit, duplicate, and delete workout
 
 React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. Secrets via SSM Parameter Store, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, 120 automated tests, and CI/CD via GitHub Actions.
 
-**Just added:** CI/CD pipeline — unified GitHub Actions workflow with change detection, OIDC auth to AWS, native ARM Docker builds, and zero-downtime rolling deploys.
-
 ## Architecture
 
 ```
@@ -85,6 +83,7 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 - ECR image pipeline with IAM instance role authentication
 - 120 automated tests: 91 backend (node:test + supertest + mongodb-memory-server) and 29 E2E (Playwright)
 - CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, native ARM builds with Docker layer caching, zero-downtime ASG instance refresh with auto-rollback, post-deploy smoke test
+- Load tested with k6 to validate horizontal scaling handles CPU-bound load which fails on single instance
 
 ---
 

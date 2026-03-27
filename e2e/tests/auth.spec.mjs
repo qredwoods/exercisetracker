@@ -75,8 +75,7 @@ test.describe('Authentication', () => {
     await signupViaUI(page, user);
     await page.click(SEL.signoutBtn);
 
-    // Try to sign up again with the same email
-    await page.click(SEL.authToggleBtn);
+    // Try to sign up again with the same email (already on signup by default)
     await page.fill('input[placeholder="First name"]', 'Another');
     await page.fill('input[placeholder="Last name"]', 'Person');
     await page.fill('input[placeholder="Email"]', user.email);

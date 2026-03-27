@@ -63,7 +63,7 @@ export async function signupViaUI(page, user) {
   await page.context().clearCookies();
   await page.goto('/');
   // Switch to signup mode
-  await page.click(SEL.authToggleBtn);
+  // Already on signup mode by default
   // Fill signup fields
   await page.fill('input[placeholder="First name"]', user.firstName);
   await page.fill('input[placeholder="Last name"]', user.lastName);
@@ -79,6 +79,7 @@ export async function signupViaUI(page, user) {
 /** Log in an existing user via the UI */
 export async function loginViaUI(page, email, password) {
   await page.goto('/');
+  await page.click(SEL.authToggleBtn);
   await page.fill('input[placeholder="Email"]', email);
   await page.fill('input[placeholder="Password"]', password);
   await page.click(SEL.authSubmit);

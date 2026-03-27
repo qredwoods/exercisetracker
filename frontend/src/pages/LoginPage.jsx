@@ -2,7 +2,7 @@ import { useState } from "react";
 import { login, signup, startDemo } from "../utils/api";
 
 export default function LoginPage({ onAuth }) {
-  const [isSignup, setIsSignup] = useState(false);
+  const [isSignup, setIsSignup] = useState(true);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,6 +15,12 @@ export default function LoginPage({ onAuth }) {
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [demoLoading, setDemoLoading] = useState(false);
+
+  const isFormComplete = isSignup
+    ? (firstName.trim() && lastName.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+      && password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password)
+      && password === confirmPassword && ageConfirmed)
+    : (email.trim() && password);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,7 +127,7 @@ export default function LoginPage({ onAuth }) {
 
         {error && <div className="auth-error">{error}</div>}
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
           {isSignup && (
             <div className="name-row">
               <input
@@ -241,7 +247,7 @@ export default function LoginPage({ onAuth }) {
             </label>
           )}
           <button
-            className="auth-submit"
+            className={`auth-submit${isFormComplete ? "" : " auth-submit--muted"}`}
             type="submit"
             disabled={loading}
           >

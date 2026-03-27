@@ -79,7 +79,6 @@ test.describe('Form Validation', () => {
 test.describe('Signup Validation', () => {
   test('Password mismatch — shows error', async ({ page }) => {
     await page.goto('/');
-    await page.click(SEL.authToggleBtn);
     await page.fill('input[placeholder="First name"]', 'Test');
     await page.fill('input[placeholder="Last name"]', 'User');
     await page.fill('input[placeholder="Email"]', 'mismatch@example.com');
@@ -92,7 +91,6 @@ test.describe('Signup Validation', () => {
 
   test('Short password — shows error', async ({ page }) => {
     await page.goto('/');
-    await page.click(SEL.authToggleBtn);
     await page.fill('input[placeholder="First name"]', 'Test');
     await page.fill('input[placeholder="Last name"]', 'User');
     await page.fill('input[placeholder="Email"]', 'short@example.com');
@@ -105,7 +103,6 @@ test.describe('Signup Validation', () => {
 
   test('Age not confirmed — shows error', async ({ page }) => {
     await page.goto('/');
-    await page.click(SEL.authToggleBtn);
     await page.fill('input[placeholder="First name"]', 'Test');
     await page.fill('input[placeholder="Last name"]', 'User');
     await page.fill('input[placeholder="Email"]', 'noage@example.com');
