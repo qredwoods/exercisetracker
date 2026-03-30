@@ -1,4 +1,4 @@
-import { createEncryptionKey, unlockEncryptionKey, clearDataKey, hasDataKey } from "./crypto";
+import { createEncryptionKey, unlockEncryptionKey, clearDataKey } from "./crypto";
 import { clearCache } from "./cache";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
