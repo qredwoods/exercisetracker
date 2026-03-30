@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 import { FiArrowLeft, FiPlus } from "react-icons/fi";
-import { apiFetch } from "../utils/api";
+import { apiFetch, hasDataKey } from "../utils/api";
+import { encryptExercise, decryptExercise } from "../utils/crypto";
 import ExerciseForm from "../components/ExerciseForm";
 import useFormError from "../utils/useFormError";
 import ConfirmOverlay from "../components/ConfirmOverlay";
@@ -33,20 +34,24 @@ const ExerciseFormPage = ({ setExercises, exerciseDraft, setExerciseDraft, showT
 
   const handleSubmit = async (exercise) => {
     try {
+      const payload = hasDataKey() ? await encryptExercise(exercise) : exercise;
+
       if (isEdit) {
-        const updated = await apiFetch(`/api/exercises/${exerciseDraft._id}`, {
+        const raw = await apiFetch(`/api/exercises/${exerciseDraft._id}`, {
           method: "PUT",
-          body: JSON.stringify(exercise),
+          body: JSON.stringify(payload),
         });
+        const updated = hasDataKey() ? await decryptExercise(raw) : raw;
         setExercises((prev) =>
           prev.map((e) => (e._id === updated._id ? updated : e))
         );
         navigate("/");
       } else {
-        const created = await apiFetch("/api/exercises", {
+        const raw = await apiFetch("/api/exercises", {
           method: "POST",
-          body: JSON.stringify(exercise),
+          body: JSON.stringify(payload),
         });
+        const created = hasDataKey() ? await decryptExercise(raw) : raw;
         setExercises((prev) => [...prev, created]);
         setHighlightId(created._id);
 

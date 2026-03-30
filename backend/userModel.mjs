@@ -31,6 +31,14 @@ const userSchema = mongoose.Schema({
     type: Date,
     required: true,
   },
+  encryptedKey: {
+    type: String,
+    default: null,
+  },
+  keySalt: {
+    type: String,
+    default: null,
+  },
   isDemo: {
     type: Boolean,
     default: false,
