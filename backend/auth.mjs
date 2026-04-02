@@ -66,7 +66,7 @@ function setRefreshCookie(res, token) {
 
 // ── signup ──────────────────────────────────────────────
 router.post('/signup', async (req, res) => {
-  const { firstName, lastName, email, password, ageConfirmed } = req.body;
+  const { firstName, lastName, email, password, ageConfirmed, encryptedKey, keySalt } = req.body;
 
   if (!ageConfirmed) {
     return res.status(400).json({ error: 'You must confirm you are 13 or older.' });
@@ -118,6 +118,12 @@ router.post('/signup', async (req, res) => {
   }
 
   const user = await createUser(firstName.trim(), lastName.trim(), email, password);
+
+  if (encryptedKey && keySalt) {
+    user.encryptedKey = encryptedKey;
+    user.keySalt = keySalt;
+    await user.save();
+  }
 
   const accessToken = signAccessToken(user._id);
   const refreshToken = signRefreshToken(user._id);

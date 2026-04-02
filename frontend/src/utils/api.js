@@ -1,3 +1,6 @@
+import { createEncryptionKey, unlockEncryptionKey, clearDataKey } from "./crypto";
+import { clearCache } from "./cache";
+
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
 // ── token storage (in-memory, not localStorage) ─────────
@@ -85,13 +88,22 @@ export async function login(email, password) {
     body: JSON.stringify({ email, password }),
   });
   setAccessToken(data.accessToken);
+
+  // unlock encryption key if user has one (non-demo accounts)
+  if (data.user.encryptedKey && data.user.keySalt) {
+    await unlockEncryptionKey(password, data.user.encryptedKey, data.user.keySalt);
+  }
+
   return data.user;
 }
 
 export async function signup(firstName, lastName, email, password, ageConfirmed) {
+  // generate encryption key before signup so we can send it with the request
+  const { encryptedKey, keySalt } = await createEncryptionKey(password);
+
   const data = await apiFetch("/api/auth/signup", {
     method: "POST",
-    body: JSON.stringify({ firstName, lastName, email, password, ageConfirmed }),
+    body: JSON.stringify({ firstName, lastName, email, password, ageConfirmed, encryptedKey, keySalt }),
   });
   setAccessToken(data.accessToken);
   return data.user;
@@ -100,6 +112,7 @@ export async function signup(firstName, lastName, email, password, ageConfirmed)
 export async function startDemo() {
   const data = await apiFetch("/api/auth/demo", { method: "POST" });
   setAccessToken(data.accessToken);
+  // demo accounts skip encryption — data is throwaway
   return data.user;
 }
 
@@ -108,6 +121,8 @@ export async function logout() {
     await apiFetch("/api/auth/logout", { method: "POST" });
   } finally {
     clearAccessToken();
+    clearDataKey();
+    clearCache().catch(() => {});
   }
 }
 
@@ -117,8 +132,13 @@ async function fetchMe() {
 }
 
 // attempt to restore session from refresh cookie on app load
+// note: can't unlock encryption key here (no password available)
+// App.jsx will show cached exercises until user re-enters password
 export async function tryRestoreSession() {
   const token = await refreshAccessToken();
   if (!token) return null;
   return fetchMe();
 }
+
+// re-export for App.jsx to check vault lock state
+export { hasDataKey } from "./crypto";

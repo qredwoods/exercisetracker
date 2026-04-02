@@ -6,7 +6,9 @@ import LoginPage from "./pages/LoginPage";
 
 import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
-import { apiFetch, logout, tryRestoreSession } from "./utils/api";
+import { apiFetch, logout, tryRestoreSession, hasDataKey } from "./utils/api";
+import { decryptExercises } from "./utils/crypto";
+import { cacheExercises, getCachedExercises } from "./utils/cache";
 import Toast from "./components/Toast";
 
 function App() {
@@ -33,23 +35,49 @@ function App() {
     }
   }, [exercises.length, isFirstVisit]);
 
+  // keep IndexedDB cache in sync with exercises state
+  useEffect(() => {
+    if (user && exercises.length > 0) {
+      cacheExercises(exercises).catch(() => {});
+    }
+  }, [exercises, user]);
+
   // restore session from refresh cookie, then load exercises
+  // no password available here → can't unlock encryption key
+  // show cached exercises immediately, fetch server data in background
   useEffect(() => {
     tryRestoreSession()
       .then(async (user) => {
         if (user) {
           setUser(user);
           setJustLoggedIn(true);
-          await loadExercises();
+          await loadExercises({ fromCache: true });
         }
       })
       .finally(() => setAuthLoading(false));
   }, []);
 
-  const loadExercises = async () => {
+  const loadExercises = async ({ fromCache = false } = {}) => {
     setExercisesLoading(true);
+
+    // cache-first: show cached exercises immediately if available
+    if (fromCache) {
+      try {
+        const cached = await getCachedExercises();
+        if (cached.length > 0) {
+          setExercises(cached);
+          setExercisesLoading(false);
+        }
+      } catch { /* IndexedDB unavailable — continue to server */ }
+    }
+
     try {
-      const data = await apiFetch("/api/exercises");
+      const raw = await apiFetch("/api/exercises");
+      // if encrypted but no key (session restore), keep cached data
+      if (!hasDataKey() && raw.length > 0 && raw[0].name?.includes(".")) {
+        return; // cached exercises already shown
+      }
+      const data = hasDataKey() ? await decryptExercises(raw) : raw;
       setExercises(data);
     } catch (err) {
       if (err.status === 401) {
