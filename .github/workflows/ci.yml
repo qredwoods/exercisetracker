@@ -131,7 +131,6 @@ jobs:
       - if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
         working-directory: e2e
-      - run: npx playwright install-deps chromium
 
       # Start backend and frontend in the background
       - run: node controller.mjs &
