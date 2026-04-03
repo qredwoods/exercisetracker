@@ -15,6 +15,16 @@ on:
       - "frontend/**"
       - "e2e/**"
       - ".github/workflows/ci.yml"
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "What to deploy"
+        required: true
+        type: choice
+        options:
+          - backend
+          - frontend
+          - both
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -46,7 +56,7 @@ jobs:
   test:
     name: Backend tests
     needs: [changes]
-    if: needs.changes.outputs.backend == 'true'
+    if: needs.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +77,7 @@ jobs:
   lint:
     name: Lint
     needs: [changes]
-    if: needs.changes.outputs.frontend == 'true'
+    if: needs.changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
@@ -154,7 +164,7 @@ jobs:
   deploy-backend:
     name: Deploy backend
     needs: [e2e, changes]
-    if: ${{ !failure() && !cancelled() && github.event_name == 'push' && needs.changes.outputs.backend == 'true' }}
+    if: ${{ !failure() && !cancelled() && (github.event_name == 'push' && needs.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch' && (inputs.deploy == 'backend' || inputs.deploy == 'both')) }}
     runs-on: ubuntu-24.04-arm
     environment: production
     steps:
@@ -270,7 +280,7 @@ jobs:
   deploy-frontend:
     name: Deploy frontend
     needs: [e2e, changes, deploy-backend]
-    if: ${{ !failure() && !cancelled() && github.event_name == 'push' && needs.changes.outputs.frontend == 'true' }}
+    if: ${{ !failure() && !cancelled() && (github.event_name == 'push' && needs.changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch' && (inputs.deploy == 'frontend' || inputs.deploy == 'both')) }}
     runs-on: ubuntu-24.04-arm
     environment: production
     steps:
