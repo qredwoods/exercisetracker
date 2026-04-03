@@ -11,7 +11,7 @@ const router = express.Router();
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 7 : 500,
+  max: process.env.NODE_ENV === 'production' ? 10 : 500,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many attempts. Please try again later.' },
@@ -19,6 +19,14 @@ const authLimiter = rateLimit({
 
 router.use('/login', authLimiter);
 router.use('/signup', authLimiter);
+
+const demoLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 5 : 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Please try again later.' },
+});
 
 const refreshLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -185,7 +193,7 @@ router.post('/refresh', async (req, res) => {
 });
 
 // ── demo ───────────────────────────────────────────────
-router.post('/demo', authLimiter, async (req, res) => {
+router.post('/demo', demoLimiter, async (req, res) => {
   const id = crypto.randomUUID().slice(0, 8);
   const email = `demo_${id}@sparkmvmt.com`;
   const password = `Demo!${crypto.randomUUID()}`;
