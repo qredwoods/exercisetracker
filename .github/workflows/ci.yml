@@ -269,6 +269,10 @@ jobs:
             --image-tag latest \
             --image-manifest "$MANIFEST"
 
+          aws autoscaling cancel-instance-refresh \
+            --auto-scaling-group-name exercisetracker-asg || true
+          sleep 15
+
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name exercisetracker-asg \
             --preferences '{"MinHealthyPercentage":100}'
