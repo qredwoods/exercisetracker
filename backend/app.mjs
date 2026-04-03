@@ -151,10 +151,6 @@ function validateExerciseBody(body) {
 
 // health check (public) — ALB uses this to determine instance health
 app.get("/health", async (_, res) => {
-  // Intentionally broken to test rollback — revert this commit after verifying
-  if (process.env.NODE_ENV === "production") {
-    return res.status(503).json({ status: "rollback-test" });
-  }
   if (!model.isDbConnected()) {
     return res.status(503).json({ status: "degraded", db: "disconnected" });
   }
