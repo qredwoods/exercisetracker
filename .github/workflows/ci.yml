@@ -153,13 +153,17 @@ jobs:
       - run: npm test
         working-directory: e2e
 
-  # ── Deploy backend ─────────────────────────────────────────
-  deploy-backend:
-    name: Deploy backend
-    needs: [e2e, changes]
+  # ── Prepare backend (runs in parallel with E2E) ────────────
+  # Builds image, pushes to ECR, and kicks off instance refresh early
+  # so the instance boots while E2E runs (~2 min head start).
+  prepare-backend:
+    name: Prepare backend
+    needs: [changes]
     if: ${{ !failure() && !cancelled() && (github.event_name == 'push' && needs.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch' && (inputs.deploy == 'backend' || inputs.deploy == 'both')) }}
     runs-on: ubuntu-24.04-arm
     environment: production
+    outputs:
+      prev-digest: ${{ steps.prev-image.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
 
@@ -173,7 +177,6 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      # Save current latest digest so we can rollback if smoke test fails
       - id: prev-image
         run: |
           DIGEST=$(aws ecr describe-images \
@@ -204,10 +207,34 @@ jobs:
             --desired-configuration '{"LaunchTemplate":{"LaunchTemplateId":"'"$LT"'","Version":"'"$VER"'"}}' \
             --preferences '{"MinHealthyPercentage":100,"AutoRollback":true}'
 
-      # Wait for the refresh to complete (3 min initial wait, then poll every 15s, up to 10 min total).
+  # ── Deploy backend ─────────────────────────────────────────
+  # Waits for both E2E and prepare to finish. If E2E failed, cancels
+  # the in-progress refresh. Otherwise polls and smoke tests.
+  deploy-backend:
+    name: Deploy backend
+    needs: [e2e, prepare-backend]
+    if: always() && needs.prepare-backend.result == 'success'
+    runs-on: ubuntu-24.04-arm
+    environment: production
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # If E2E failed, cancel the in-progress refresh and abort
+      - if: needs.e2e.result == 'failure' || needs.e2e.result == 'cancelled'
+        run: |
+          echo "E2E failed — cancelling instance refresh"
+          aws autoscaling cancel-instance-refresh \
+            --auto-scaling-group-name exercisetracker-asg || true
+          exit 1
+
+      # Instance already has a ~2 min head start from prepare-backend.
+      # Sleep 2 min instead of 4, then poll.
       - run: |
-          echo "Waiting 3 minutes for instance to boot..."
-          sleep 180
+          echo "Waiting 2 minutes (instance already booting)..."
+          sleep 120
           echo "Polling for instance refresh status..."
           for i in $(seq 1 28); do
             STATUS=$(aws autoscaling describe-instance-refreshes \
@@ -247,9 +274,9 @@ jobs:
           echo "Fetched $COUNT exercises — smoke test passed"
 
       # Rollback — re-tag previous image as latest and refresh ASG
-      - if: failure() && steps.prev-image.outputs.digest != 'none'
+      - if: failure() && needs.prepare-backend.outputs.prev-digest != 'none'
         run: |
-          PREV=${{ steps.prev-image.outputs.digest }}
+          PREV=${{ needs.prepare-backend.outputs.prev-digest }}
           echo "Rolling back to previous image: $PREV"
 
           MANIFEST=$(aws ecr batch-get-image \
