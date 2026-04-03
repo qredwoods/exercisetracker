@@ -3,18 +3,8 @@ name: CI/CD
 on:
   push:
     branches: [main]
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - "e2e/**"
-      - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - "e2e/**"
-      - ".github/workflows/ci.yml"
   workflow_dispatch:
     inputs:
       deploy:
@@ -41,6 +31,8 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      e2e: ${{ steps.filter.outputs.e2e }}
+      ci: ${{ steps.filter.outputs.ci }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,6 +43,8 @@ jobs:
           filters: |
             backend: backend/**
             frontend: frontend/**
+            e2e: e2e/**
+            ci: .github/workflows/ci.yml
 
   # ── Backend unit & integration tests ───────────────────────
   test:
@@ -95,12 +89,12 @@ jobs:
         working-directory: frontend
 
   # ── E2E tests (Playwright) ────────────────────────────────
-  # Always runs — tests the contract between frontend and backend.
-  # Waits for fast checks to pass first to avoid wasting runner time.
+  # Tests the contract between frontend and backend.
+  # Skips when neither backend nor frontend changed (e.g. docs-only PRs).
   e2e:
     name: E2E tests
-    needs: [test, lint]
-    if: ${{ !failure() && !cancelled() }}
+    needs: [changes, test, lint]
+    if: ${{ !failure() && !cancelled() && (needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.e2e == 'true' || needs.changes.outputs.ci == 'true' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-24.04-arm
     services:
       mongo:
