@@ -269,16 +269,9 @@ jobs:
             --image-tag latest \
             --image-manifest "$MANIFEST"
 
-          LT=$(aws autoscaling describe-auto-scaling-groups \
-            --auto-scaling-group-names exercisetracker-asg \
-            --query 'AutoScalingGroups[0].LaunchTemplate.LaunchTemplateId' --output text)
-          VER=$(aws ec2 describe-launch-template-versions \
-            --launch-template-id "$LT" --versions '$Latest' \
-            --query 'LaunchTemplateVersions[0].VersionNumber' --output text)
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name exercisetracker-asg \
-            --desired-configuration '{"LaunchTemplate":{"LaunchTemplateId":"'"$LT"'","Version":"'"$VER"'"}}' \
-            --preferences '{"MinHealthyPercentage":100,"AutoRollback":true}'
+            --preferences '{"MinHealthyPercentage":100}'
 
           echo "Rollback instance refresh started"
 
