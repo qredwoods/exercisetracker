@@ -2,8 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FiArrowLeft, FiEdit3, FiCopy } from "react-icons/fi";
 import { TiDeleteOutline } from "react-icons/ti";
-import { formatDisplayDate } from "../components/ExerciseRow";
-import { todayIsoLocal } from "../utils/date";
+import { todayIsoLocal, formatDisplayDate } from "../utils/date";
 import { apiFetch } from "../utils/api";
 import ConfirmOverlay from "../components/ConfirmOverlay";
 

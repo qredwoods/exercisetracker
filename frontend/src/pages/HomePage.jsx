@@ -1,11 +1,10 @@
 import { useState } from "react";
 import ExerciseTable from "../components/ExerciseTable";
 import ConfirmOverlay from "../components/ConfirmOverlay";
-import { formatDisplayDate } from "../components/ExerciseRow";
 import { useNavigate } from "react-router-dom";
 import { flushSync } from "react-dom";
 import { apiFetch } from "../utils/api";
-import { todayIsoLocal } from "../utils/date";
+import { todayIsoLocal, formatDisplayDate } from "../utils/date";
 
 function HomePage({ user, exercises, exercisesLoading, setExercises, setExerciseDraft, showToast, isFirstVisit, justLoggedIn, onFadeComplete, highlightId, setHighlightId }) {
   const navigate = useNavigate();
