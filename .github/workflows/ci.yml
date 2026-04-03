@@ -203,9 +203,12 @@ jobs:
           LT=$(aws autoscaling describe-auto-scaling-groups \
             --auto-scaling-group-names exercisetracker-asg \
             --query 'AutoScalingGroups[0].LaunchTemplate.LaunchTemplateId' --output text)
+          VER=$(aws ec2 describe-launch-template-versions \
+            --launch-template-id "$LT" --versions '$Latest' \
+            --query 'LaunchTemplateVersions[0].VersionNumber' --output text)
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name exercisetracker-asg \
-            --desired-configuration '{"LaunchTemplate":{"LaunchTemplateId":"'"$LT"'","Version":"$Latest"}}' \
+            --desired-configuration '{"LaunchTemplate":{"LaunchTemplateId":"'"$LT"'","Version":"'"$VER"'"}}' \
             --preferences '{"MinHealthyPercentage":100,"AutoRollback":true}'
 
       # Wait for the refresh to complete (3 min initial wait, then poll every 15s, up to 10 min total).
@@ -269,9 +272,12 @@ jobs:
           LT=$(aws autoscaling describe-auto-scaling-groups \
             --auto-scaling-group-names exercisetracker-asg \
             --query 'AutoScalingGroups[0].LaunchTemplate.LaunchTemplateId' --output text)
+          VER=$(aws ec2 describe-launch-template-versions \
+            --launch-template-id "$LT" --versions '$Latest' \
+            --query 'LaunchTemplateVersions[0].VersionNumber' --output text)
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name exercisetracker-asg \
-            --desired-configuration '{"LaunchTemplate":{"LaunchTemplateId":"'"$LT"'","Version":"$Latest"}}' \
+            --desired-configuration '{"LaunchTemplate":{"LaunchTemplateId":"'"$LT"'","Version":"'"$VER"'"}}' \
             --preferences '{"MinHealthyPercentage":100,"AutoRollback":true}'
 
           echo "Rollback instance refresh started"
