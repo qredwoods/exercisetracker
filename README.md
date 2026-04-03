@@ -2,9 +2,9 @@
 
 **[Live Demo →](https://sparkmvmt.com)**
 
-Full-stack exercise tracker where users log, edit, duplicate, and delete workouts through a responsive single-page UI. One-click demo mode lets anyone try it instantly.
+Full-stack exercise tracker where users log, edit, duplicate, and delete workouts through a responsive single-page UI. Exercise names and notes are encrypted on your device before they leave the browser — not even the server can read them. One-click demo mode lets anyone try it instantly.
 
-React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. Secrets via SSM Parameter Store, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, 120 automated tests, and CI/CD via GitHub Actions.
+React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. E2E encryption (AES-256-GCM, PBKDF2-derived keys, IndexedDB cache), SSM Parameter Store for secrets, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, 120 automated tests, and CI/CD via GitHub Actions.
 
 ## Architecture
 
@@ -29,8 +29,9 @@ api.sparkmvmt.com →  │    ALB (ACM TLS termination)     │
                      │         MongoDB Atlas            │
                      └──────────────────────────────────┘
 
-CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling deploy
-       Frontend: lint → E2E → S3 sync → CloudFront invalidation
+CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling deploy → smoke test
+       Frontend deploys after backend (sequential)
+       Manual dispatch available for operational recovery
 ```
 
 - **Frontend:** Vite + React SPA deployed to S3, served via CloudFront
@@ -56,6 +57,7 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 
 ## Features
 
+- **E2E encryption** — exercise names and notes encrypted client-side before leaving the browser; the server stores only ciphertext
 - **Demo mode** — one-click demo account with ~25 seeded exercises, full CRUD access, auto-deleted after 24h
 - Log, edit, duplicate, and delete exercises
 - Exercise detail page with optional notes
@@ -82,7 +84,10 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 - Graceful shutdown on SIGTERM for zero-downtime container deploys
 - ECR image pipeline with IAM instance role authentication
 - 120 automated tests: 91 backend (node:test + supertest + mongodb-memory-server) and 29 E2E (Playwright)
-- CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, native ARM builds with Docker layer caching, zero-downtime ASG instance refresh with auto-rollback, post-deploy smoke test
+- Client-side E2E encryption — AES-256-GCM with PBKDF2-derived keys, per-field IV, IndexedDB cache for decrypted data across sessions. Zero-knowledge: the server never sees plaintext or the user's password
+- CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, native ARM builds with Docker layer caching, sequential deploy ordering (backend then frontend), zero-downtime ASG instance refresh with AWS-native auto-rollback, post-deploy smoke test, manual dispatch for operational recovery
+- Branch protection on main — required status checks (lint, backend tests, E2E), strict up-to-date, enforce admins
+- Least-privilege IAM — ec2:RunInstances scoped to launch template via condition key, PassRole restricted to EC2 service
 - Load tested with k6 to validate horizontal scaling handles CPU-bound load which fails on single instance
 
 ---
@@ -94,7 +99,7 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 │   └── src/
 │       ├── pages/          # LoginPage, HomePage, ExerciseFormPage, ExerciseDetail
 │       ├── components/     # ExerciseForm, ExerciseTable, ExerciseRow, ConfirmOverlay, Toast
-│       └── utils/          # API client (token refresh, auth headers), date helpers, useFormError hook
+│       └── utils/          # API client (token refresh, auth headers), crypto (E2E encryption), cache (IndexedDB), date helpers, useFormError hook
 ├── backend/
 │   ├── app.mjs              # Express app setup (routes, middleware, validation) — importable by tests
 │   ├── controller.mjs       # Entry point: connects DB, starts server
@@ -167,11 +172,13 @@ push/PR → change detection → backend tests (if changed)
                             → frontend lint (if changed)
                             → E2E tests (always)
                             → deploy backend (if changed, push only)
-                            → deploy frontend (if changed, push only)
+                            → deploy frontend (after backend, if changed, push only)
+
+Manual dispatch: workflow_dispatch with backend/frontend/both selector
 ```
 
 - **Auth:** GitHub OIDC → AWS STS temporary credentials (no stored access keys)
-- **Backend deploy:** Native ARM Docker build with layer caching → ECR push → ASG instance refresh (zero-downtime, auto-rollback) → smoke test (demo creation + authenticated read) → automatic rollback on failure
+- **Backend deploy:** Native ARM Docker build with layer caching → ECR push → ASG instance refresh (zero-downtime, pinned launch template version, AWS-native auto-rollback) → smoke test (demo creation + authenticated read) → CI rollback on failure (re-tags previous ECR image)
 - **Frontend deploy:** Vite build → S3 sync → CloudFront invalidation
 
 ### Infrastructure
@@ -200,6 +207,13 @@ push/PR → change detection → backend tests (if changed)
 Short-lived access tokens held in memory, long-lived refresh tokens in httpOnly cookies. Access tokens are never persisted to localStorage to limit XSS exposure.
 
 Argon2 over bcrypt for password hashing due to resistance to GPU-based attacks. Input length limits prevent hash-based DoS. The frontend API client handles silent token refresh on 401 and session restoration on page load, so users stay logged in across tabs without tokens in storage.
+
+### E2E Encryption
+Exercise data (name, notes) is encrypted client-side using AES-256-GCM before being sent to the server. Encryption keys are derived from the user's password via PBKDF2 (600,000 iterations) — the password itself never leaves the browser. Each field gets a unique IV, and the encrypted key material is stored on the user record so it can be re-derived on login.
+
+Decrypted exercises are cached in IndexedDB so the app works across page reloads without re-deriving keys. On session restore (refresh token, no password available), the cache serves exercises until the user logs in again. Demo accounts skip encryption entirely.
+
+This is a zero-knowledge architecture: even with full database access, exercise data is unreadable without the user's password.
 
 ### Demo Mode
 Clicking "Try the demo" creates a throwaway user with ~25 realistic seeded exercises spread across the last few weeks. Demo users get full CRUD access — the experience is identical to a real account. Both the user and their exercises have a `demoExpiresAt` field with a MongoDB TTL index, so they're automatically cleaned up after 24 hours with zero maintenance.
