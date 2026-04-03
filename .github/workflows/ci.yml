@@ -32,6 +32,7 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
       e2e: ${{ steps.filter.outputs.e2e }}
+      ci: ${{ steps.filter.outputs.ci }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,6 +44,7 @@ jobs:
             backend: backend/**
             frontend: frontend/**
             e2e: e2e/**
+            ci: .github/workflows/ci.yml
 
   # ── Backend unit & integration tests ───────────────────────
   test:
@@ -92,7 +94,7 @@ jobs:
   e2e:
     name: E2E tests
     needs: [changes, test, lint]
-    if: ${{ !failure() && !cancelled() && (needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.e2e == 'true' || github.event_name == 'workflow_dispatch') }}
+    if: ${{ !failure() && !cancelled() && (needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.e2e == 'true' || needs.changes.outputs.ci == 'true' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-24.04-arm
     services:
       mongo:
