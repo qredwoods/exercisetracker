@@ -186,10 +186,6 @@ router.post('/refresh', async (req, res) => {
 
 // ── demo ───────────────────────────────────────────────
 router.post('/demo', authLimiter, async (req, res) => {
-  // Intentionally broken to test smoke test rollback — revert after verifying
-  if (process.env.NODE_ENV === "production") {
-    return res.status(500).json({ error: "rollback-test" });
-  }
   const id = crypto.randomUUID().slice(0, 8);
   const email = `demo_${id}@sparkmvmt.com`;
   const password = `Demo!${crypto.randomUUID()}`;
