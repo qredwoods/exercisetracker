@@ -1,28 +1,6 @@
 import { TiDeleteOutline } from "react-icons/ti";
 import { FiEdit3, FiCopy } from "react-icons/fi";
-
-function formatDisplayDate(dateString) {
-  const [year, month, day] = dateString.split("-");
-
-  const date = new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day)
-  );
-
-  const monthDay = date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
-  const yearStr = date.toLocaleDateString("en-US", { year: "numeric" });
-  const numeric = `${Number(month)}/${day}`;
-
-  return <>
-    <span className="date-month-day">{monthDay}</span>
-    <span className="date-numeric">{numeric}</span>
-    <span className="date-year">, {yearStr}</span>
-  </>;
-}
+import { formatDisplayDate } from "../utils/date";
 
 const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView, highlight, onHighlightEnd, deleting, flashField }) => {
   const { name, reps, weight, unit, date, _id } = exercise;
@@ -77,5 +55,4 @@ const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView, highligh
   );
 };
 
-export { formatDisplayDate };
 export default ExerciseRow;

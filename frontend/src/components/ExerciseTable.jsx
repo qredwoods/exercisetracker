@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
-import ExerciseRow, { formatDisplayDate } from './ExerciseRow'
+import ExerciseRow from './ExerciseRow'
+import { formatDisplayDate } from '../utils/date'
 
 const EXAMPLE_ROW = {
   name: "Example — Barbell Squat",
