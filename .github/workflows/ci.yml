@@ -190,8 +190,12 @@ jobs:
             backend/
 
       - run: |
+          LT=$(aws autoscaling describe-auto-scaling-groups \
+            --auto-scaling-group-names exercisetracker-asg \
+            --query 'AutoScalingGroups[0].LaunchTemplate.LaunchTemplateId' --output text)
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name exercisetracker-asg \
+            --desired-configuration '{"LaunchTemplate":{"LaunchTemplateId":"'"$LT"'","Version":"$Latest"}}' \
             --preferences '{"MinHealthyPercentage":100,"AutoRollback":true}'
 
       # Wait for the refresh to complete (3 min initial wait, then poll every 15s, up to 10 min total).
@@ -252,8 +256,12 @@ jobs:
             --image-tag latest \
             --image-manifest "$MANIFEST"
 
+          LT=$(aws autoscaling describe-auto-scaling-groups \
+            --auto-scaling-group-names exercisetracker-asg \
+            --query 'AutoScalingGroups[0].LaunchTemplate.LaunchTemplateId' --output text)
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name exercisetracker-asg \
+            --desired-configuration '{"LaunchTemplate":{"LaunchTemplateId":"'"$LT"'","Version":"$Latest"}}' \
             --preferences '{"MinHealthyPercentage":100,"AutoRollback":true}'
 
           echo "Rollback instance refresh started"
@@ -261,7 +269,7 @@ jobs:
   # ── Deploy frontend ────────────────────────────────────────
   deploy-frontend:
     name: Deploy frontend
-    needs: [e2e, changes]
+    needs: [e2e, changes, deploy-backend]
     if: ${{ !failure() && !cancelled() && github.event_name == 'push' && needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-24.04-arm
     environment: production
