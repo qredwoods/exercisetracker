@@ -1,4 +1,3 @@
-import React from "react";
 import { TiDeleteOutline } from "react-icons/ti";
 import { FiEdit3, FiCopy } from "react-icons/fi";
 import { formatDisplayDate } from "../utils/date";
