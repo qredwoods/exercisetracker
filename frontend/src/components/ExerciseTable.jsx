@@ -14,7 +14,7 @@ const EXAMPLE_ROW = {
   date: new Date().toISOString().slice(0, 10),
 };
 
-const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, isFirstVisit, fadeIn, onFadeComplete, highlightId, onHighlightEnd, deletingId}) => {
+const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, onCreate, isFirstVisit, fadeIn, onFadeComplete, highlightId, onHighlightEnd, deletingId}) => {
   const [sort, setSort] = useState({ field: "date", dir: "desc" });
   const [flashField, setFlashField] = useState(null);
   const [visibleCount, setVisibleCount] = useState(DEFAULT_VISIBLE_COUNT);
@@ -76,7 +76,7 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, 
       {!isEmpty && (
         <>
           <p className="table-heading">
-            Exercise Log · {exercises.length} {exercises.length === 1 ? 'entry' : 'entries'}
+            {exercises.length} {exercises.length === 1 ? 'entry' : 'entries'}
           </p>
         </>
       )}
@@ -138,14 +138,14 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, 
                 <div className="table-overlay-actions">
                   {hasMoreExercises && (
                     <>
-                      {visibleCount > DEFAULT_VISIBLE_COUNT && (
-                        <button
-                          className="table-more-button"
-                          onClick={() => setVisibleCount(DEFAULT_VISIBLE_COUNT)}
-                        >
-                          Less
-                        </button>
-                      )}
+                      <button
+                        className={`table-more-button${visibleCount > DEFAULT_VISIBLE_COUNT ? "" : " table-more-button--hidden"}`}
+                        onClick={() => setVisibleCount(DEFAULT_VISIBLE_COUNT)}
+                        aria-hidden={visibleCount > DEFAULT_VISIBLE_COUNT ? undefined : true}
+                        tabIndex={visibleCount > DEFAULT_VISIBLE_COUNT ? undefined : -1}
+                      >
+                        Less
+                      </button>
                       <button
                         className="table-more-button"
                         onClick={handleShowMore}
@@ -157,6 +157,12 @@ const ExerciseTable = ({user, exercises, onDelete, onEdit, onDuplicate, onView, 
                         onClick={() => setVisibleCount(sorted.length)}
                       >
                         All
+                      </button>
+                      <button
+                        className="table-more-button table-more-button--add"
+                        onClick={onCreate}
+                      >
+                        + Add
                       </button>
                     </>
                   )}

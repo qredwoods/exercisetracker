@@ -73,6 +73,11 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
         onPurposeChange={onPurposeChange}
         onPRClick={onPRClick}
       />
+      <div className="cta-row-fixed">
+        <button className="cta-button" onClick={() => { flushSync(() => setExerciseDraft(null)); navigate("/create"); }}>
+          Log Exercise
+        </button>
+      </div>
       <ExerciseTable
         user={user}
         exercises={exercises}
@@ -80,6 +85,7 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
         onEdit={onEdit}
         onDuplicate={onDuplicate}
         onView={onView}
+        onCreate={() => { flushSync(() => setExerciseDraft(null)); navigate("/create"); }}
         isFirstVisit={isFirstVisit}
         fadeIn={justLoggedIn}
         onFadeComplete={onFadeComplete}
@@ -87,12 +93,6 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
         onHighlightEnd={() => setHighlightId(null)}
         deletingId={deletingId}
       />
-
-      <div className="cta-row-fixed">
-        <button className="cta-button" onClick={() => { flushSync(() => setExerciseDraft(null)); navigate("/create"); }}>
-          Log Exercise
-        </button>
-      </div>
 
       {deleteTarget && (
         <ConfirmOverlay

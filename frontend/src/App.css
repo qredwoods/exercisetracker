@@ -5,18 +5,47 @@ html {
 
 body {
   color: var(--color-text);
-  background-color: navy;
-  background: linear-gradient(
-    160deg,
-    #091755 0%,
-    #143a90 40%,
-    #17305a 70%,
-    #0f172a 100%);
+  background: transparent;
   font-family: 'IBM Plex Mono', monospace;
   margin: 1em;
   padding: 2em;
   text-align: center;
   box-sizing: border-box;
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(
+      160deg,
+      #091755 0%,
+      #143a90 40%,
+      #17305a 70%,
+      #0f172a 100%
+    );
+  z-index: -1;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(36, 74, 162, 0.08) 0%,
+      rgba(36, 74, 162, 0.03) 28%,
+      rgba(20, 48, 112, 0.08) 62%,
+      rgba(15, 23, 42, 0.18) 100%
+    );
+  z-index: -1;
+  pointer-events: none;
 }
 
 button {
@@ -132,11 +161,16 @@ button:disabled {
 
 .cta-row-fixed {
   position: sticky;
-  bottom: 1.5rem;
+  top: 1rem;
   display: flex;
   justify-content: center;
-  margin-top: 0.5rem;
+  margin: 0.35rem 0 0.9rem;
   z-index: 100;
+  pointer-events: none;
+}
+
+.cta-row-fixed .cta-button {
+  pointer-events: auto;
 }
 
 .dual-btn {
@@ -1006,6 +1040,8 @@ footer .copyright {
   flex-wrap: wrap;
   gap: 0.65rem;
   max-width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .table-subheading--overlay {
@@ -1047,6 +1083,17 @@ footer .copyright {
     rgba(2, 6, 23, 0.96)
   );
   transform: translateY(-1px);
+}
+
+.table-more-button--add {
+  padding-inline: 0.8rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+
+.table-more-button--hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 @keyframes cell-collapse {
