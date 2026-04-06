@@ -2,7 +2,17 @@ import { TiDeleteOutline } from "react-icons/ti";
 import { FiEdit3, FiCopy } from "react-icons/fi";
 import { formatDisplayDate } from "../utils/date";
 
-const ExerciseRow = ({ exercise, onDelete, onEdit, onDuplicate, onView, highlight, onHighlightEnd, deleting, flashField }) => {
+const ExerciseRow = ({
+  exercise,
+  onDelete,
+  onEdit,
+  onDuplicate,
+  onView,
+  highlight,
+  onHighlightEnd,
+  deleting,
+  flashField,
+}) => {
   const { name, reps, weight, unit, date, _id } = exercise;
   const isBodyweight = unit === "bodyweight";
 
