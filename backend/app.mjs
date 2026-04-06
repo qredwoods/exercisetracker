@@ -7,6 +7,7 @@ import { requireAuth, validateId } from "./middleware.mjs";
 import "dotenv/config";
 import cors from "cors";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { benchmarkRouter } from "./benchmark.mjs";
 
 const app = express();
@@ -56,6 +57,28 @@ app.get("/api/auth/me", requireAuth, async (req, res) => {
     return res.status(404).json({ error: "User not found." });
   }
   res.status(200).json({ user });
+});
+
+const purposeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === "production" ? 20 : 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many attempts. Please try again later." },
+});
+
+app.patch("/api/auth/me/purpose", requireAuth, purposeLimiter, async (req, res) => {
+  const { purpose } = req.body;
+  if (typeof purpose !== "string" || purpose.length > 100) {
+    return res.status(400).json({ error: "Purpose must be a string under 100 characters." });
+  }
+  const user = await User.findByIdAndUpdate(
+    req.userId,
+    { purpose: purpose.trim() },
+    { new: true }
+  );
+  if (!user) return res.status(404).json({ error: "User not found." });
+  res.status(200).json({ purpose: user.purpose });
 });
 
 app.use("/api/exercises", requireAuth);

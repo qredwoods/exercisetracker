@@ -1,12 +1,13 @@
 import { useState } from "react";
 import ExerciseTable from "../components/ExerciseTable";
+import DashboardSummary from "../components/DashboardSummary";
 import ConfirmOverlay from "../components/ConfirmOverlay";
 import { useNavigate } from "react-router-dom";
 import { flushSync } from "react-dom";
 import { apiFetch } from "../utils/api";
 import { todayIsoLocal, formatDisplayDate } from "../utils/date";
 
-function HomePage({ user, exercises, exercisesLoading, setExercises, setExerciseDraft, showToast, isFirstVisit, justLoggedIn, onFadeComplete, highlightId, setHighlightId }) {
+function HomePage({ user, exercises, exercisesLoading, setExercises, setExerciseDraft, showToast, isFirstVisit, justLoggedIn, onFadeComplete, highlightId, setHighlightId, onPurposeChange }) {
   const navigate = useNavigate();
   const today = todayIsoLocal();
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -51,6 +52,10 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
     navigate(`/exercise/${exercise._id}`);
   };
 
+  const onPRClick = (exercise) => {
+    setExerciseDraft(exercise);
+    navigate(`/exercise/${exercise._id}`);
+  };
 
   if (exercisesLoading) {
     return (
@@ -62,6 +67,17 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
 
   return (
     <div>
+      <DashboardSummary
+        exercises={exercises}
+        user={user}
+        onPurposeChange={onPurposeChange}
+        onPRClick={onPRClick}
+      />
+      <div className="cta-row-fixed">
+        <button className="cta-button" onClick={() => { flushSync(() => setExerciseDraft(null)); navigate("/create"); }}>
+          Log Exercise
+        </button>
+      </div>
       <ExerciseTable
         user={user}
         exercises={exercises}
@@ -69,6 +85,7 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
         onEdit={onEdit}
         onDuplicate={onDuplicate}
         onView={onView}
+        onCreate={() => { flushSync(() => setExerciseDraft(null)); navigate("/create"); }}
         isFirstVisit={isFirstVisit}
         fadeIn={justLoggedIn}
         onFadeComplete={onFadeComplete}
@@ -76,12 +93,6 @@ function HomePage({ user, exercises, exercisesLoading, setExercises, setExercise
         onHighlightEnd={() => setHighlightId(null)}
         deletingId={deletingId}
       />
-
-      <div className="cta-row-fixed">
-        <button className="cta-button" onClick={() => { flushSync(() => setExerciseDraft(null)); navigate("/create"); }}>
-          Log Exercise
-        </button>
-      </div>
 
       {deleteTarget && (
         <ConfirmOverlay

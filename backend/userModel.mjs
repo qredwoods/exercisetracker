@@ -39,6 +39,12 @@ const userSchema = mongoose.Schema({
     type: String,
     default: null,
   },
+  purpose: {
+    type: String,
+    trim: true,
+    maxlength: 100,
+    default: '',
+  },
   isDemo: {
     type: Boolean,
     default: false,

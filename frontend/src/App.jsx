@@ -5,9 +5,10 @@ import ExerciseDetailPage from "./pages/ExerciseDetailPage";
 import LoginPage from "./pages/LoginPage";
 
 import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
-import { apiFetch, logout, tryRestoreSession, hasDataKey } from "./utils/api";
-import { decryptExercises } from "./utils/crypto";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { apiFetch, logout, tryRestoreSession, hasDataKey, updatePurpose } from "./utils/api";
+import { decryptExercises, encrypt, decrypt, getDataKey } from "./utils/crypto";
+import { computePRs } from "./utils/pr";
 import { cacheExercises, getCachedExercises } from "./utils/cache";
 import Toast from "./components/Toast";
 
@@ -27,6 +28,7 @@ function App() {
     return true;
   });
   const showWelcome = exercises.length === 0 && isFirstVisit && !exercisesLoading;
+  const prData = useMemo(() => computePRs(exercises), [exercises]);
 
   // Once exercises appear, welcome should never come back this session
   useEffect(() => {
@@ -89,12 +91,30 @@ function App() {
   };
 
   const handleAuth = async (userData) => {
+    // decrypt purpose if encrypted (contains "." separator from AES-GCM format)
+    if (hasDataKey() && userData.purpose && userData.purpose.includes(".")) {
+      try {
+        userData = { ...userData, purpose: await decrypt(userData.purpose, getDataKey()) };
+      } catch { /* leave as-is if decryption fails */ }
+    }
     setUser(userData);
     setJustLoggedIn(true);
     await loadExercises();
   };
 
   const navigate = useNavigate();
+
+  const handlePurposeUpdate = async (purpose) => {
+    try {
+      const payload = hasDataKey()
+        ? await encrypt(purpose, getDataKey())
+        : purpose;
+      await updatePurpose(payload);
+      setUser((prev) => ({ ...prev, purpose }));
+    } catch (err) {
+      showToast(err.message);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -154,6 +174,7 @@ if (authLoading) {
               onFadeComplete={() => setJustLoggedIn(false)}
               highlightId={highlightId}
               setHighlightId={setHighlightId}
+              onPurposeChange={handlePurposeUpdate}
             />
           }
         />
@@ -189,6 +210,7 @@ if (authLoading) {
               setExerciseDraft={setExerciseDraft}
               setExercises={setExercises}
               showToast={showToast}
+              prData={prData}
             />
           }
         />

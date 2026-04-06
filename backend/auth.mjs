@@ -202,6 +202,7 @@ router.post('/demo', demoLimiter, async (req, res) => {
   const user = await createUser('Demo', 'User', email, password);
   user.isDemo = true;
   user.demoExpiresAt = demoExpiresAt;
+  user.purpose = 'Keep up with my future grandkids';
   await user.save();
 
   const exercises = generateDemoExercises(user._id, demoExpiresAt);

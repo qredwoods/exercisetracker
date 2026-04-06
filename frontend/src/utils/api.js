@@ -116,6 +116,13 @@ export async function startDemo() {
   return data.user;
 }
 
+export async function updatePurpose(purpose) {
+  return apiFetch("/api/auth/me/purpose", {
+    method: "PATCH",
+    body: JSON.stringify({ purpose }),
+  });
+}
+
 export async function logout() {
   try {
     await apiFetch("/api/auth/logout", { method: "POST" });
