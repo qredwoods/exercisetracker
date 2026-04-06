@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FiArrowLeft, FiEdit3, FiCopy } from "react-icons/fi";
+import { FiArrowLeft, FiEdit3, FiCopy, FiAward } from "react-icons/fi";
 import { TiDeleteOutline } from "react-icons/ti";
 import { todayIsoLocal, formatDisplayDate } from "../utils/date";
 import { apiFetch } from "../utils/api";
 import ConfirmOverlay from "../components/ConfirmOverlay";
 
-const ExerciseDetailPage = ({ exerciseDraft, setExerciseDraft, setExercises, showToast }) => {
+const ExerciseDetailPage = ({ exerciseDraft, setExerciseDraft, setExercises, showToast, prData }) => {
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showPRTip, setShowPRTip] = useState(false);
   const exercise = exerciseDraft;
 
   if (!exercise?._id) {
@@ -26,6 +27,8 @@ const ExerciseDetailPage = ({ exerciseDraft, setExerciseDraft, setExercises, sho
 
   const { name, reps, weight, unit, date, notes, _id } = exercise;
   const isBodyweight = unit === "bodyweight";
+  const isCurrentPR = prData?.currentPRs?.has(_id);
+  const isHistoricPR = prData?.historicPRs?.has(_id);
 
   const onEdit = () => {
     setExerciseDraft(exercise);
@@ -54,6 +57,20 @@ const ExerciseDetailPage = ({ exerciseDraft, setExerciseDraft, setExercises, sho
   return (
     <div className="detail-page">
       <div className="detail-card">
+        {isCurrentPR && (
+          <span
+            className={`pr-badge-pinned${showPRTip ? " pr-badge-pinned--show-tip" : ""}`}
+            data-tooltip="Personal Record"
+            onTouchStart={() => setShowPRTip((s) => !s)}
+          ><FiAward /></span>
+        )}
+        {isHistoricPR && !isCurrentPR && (
+          <span
+            className={`pr-badge-pinned pr-badge-pinned--historic${showPRTip ? " pr-badge-pinned--show-tip" : ""}`}
+            data-tooltip="PR at the time"
+            onTouchStart={() => setShowPRTip((s) => !s)}
+          ><FiAward /></span>
+        )}
         <h2 className="detail-name">{name}</h2>
 
         <div className="detail-fields">
