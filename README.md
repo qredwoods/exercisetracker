@@ -2,9 +2,9 @@
 
 **[Live Demo →](https://sparkmvmt.com)**
 
-Full-stack exercise tracker where users log, edit, duplicate, and delete workouts through a responsive single-page UI. Exercise names and notes are encrypted on your device before they leave the browser — not even the server can read them. One-click demo mode lets anyone try it instantly.
+Full-stack exercise tracker for logging workouts and getting something meaningful back from the habit. A dashboard reflects activity with adaptive exercise counts, editable purpose, and latest PR surfacing, while exercise names and notes are encrypted on your device before they leave the browser. One-click demo mode lets anyone try it instantly.
 
-React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. E2E encryption (AES-256-GCM, PBKDF2-derived keys, IndexedDB cache), SSM Parameter Store for secrets, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, 120 automated tests, and CI/CD via GitHub Actions.
+React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. E2E encryption (AES-256-GCM, PBKDF2-derived keys, IndexedDB cache), SSM Parameter Store for secrets, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, 133 automated tests, and CI/CD via GitHub Actions.
 
 ## Architecture
 
@@ -29,9 +29,9 @@ api.sparkmvmt.com →  │    ALB (ACM TLS termination)     │
                      │         MongoDB Atlas            │
                      └──────────────────────────────────┘
 
-CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling deploy → smoke test
-       Frontend deploys after backend (sequential)
-       Manual dispatch available for operational recovery
+CI/CD: GitHub Actions → backend/frontend checks → E2E → backend deploy + smoke test → frontend deploy
+Frontend deploys independently on frontend-only changes; full-stack deploys sequence backend then frontend.
+Manual dispatch is available for operational recovery.
 ```
 
 - **Frontend:** Vite + React SPA deployed to S3, served via CloudFront
@@ -42,31 +42,34 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 ## Screenshots
 
 ![Sign up](docs/01-signup.png)
-*Account creation with real-time password validation*
+*Account creation with live validation and a direct path into the app*
 
 ![Welcome](docs/02-home-empty.png)
-*Empty state with example row and welcome message*
+*First-run home state that points the user toward logging right away*
 
 ![Exercise log](docs/04-home-populated.png)
-*Home page with logged exercises*
+*Dashboard that reflects progress back to the user with activity, purpose, PRs, and a progressive log*
 
 ![Log an exercise](docs/03-create-exercise.png)
-*Exercise form with bodyweight support*
+*Exercise form with room for context, not just reps and weight*
 
 ---
 
 ## Features
 
+- **Dashboard summary** — adaptive exercise count card, editable purpose, and latest PR card on arrival
+- **Personal record tracking** — current and historic PR detection for weighted and bodyweight movements
+- **Demo mode** — one-click demo account with realistic seeded history, full CRUD access, auto-deleted after 24h
 - **E2E encryption** — exercise names and notes encrypted client-side before leaving the browser; the server stores only ciphertext
-- **Demo mode** — one-click demo account with ~25 seeded exercises, full CRUD access, auto-deleted after 24h
 - Log, edit, duplicate, and delete exercises
 - Exercise detail page with optional notes
 - Clickable table rows for quick access to details
+- Progressive exercise log reveal with `Less / More / All` controls and filtered tail preview
 - Dual save buttons on create: save & return, or save & add another
 - Confirm overlays for delete and discard actions
 - Bodyweight exercise support
 - Responsive desktop and mobile layouts with adaptive date formatting
-- Floating action button for quick exercise logging
+- Sticky log CTA for quick exercise logging
 - Accessible form controls with keyboard navigation
 - Real-time form validation with toast feedback
 - Session restoration across page reloads with loading states
@@ -83,10 +86,10 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 - DB-aware health check (`/health` verifies MongoDB connection) — ALB auto-replaces unhealthy instances
 - Graceful shutdown on SIGTERM for zero-downtime container deploys
 - ECR image pipeline with IAM instance role authentication
-- 120 automated tests: 91 backend (node:test + supertest + mongodb-memory-server) and 29 E2E (Playwright)
+- 133 automated tests: 96 backend (node:test + supertest + mongodb-memory-server), 8 frontend (Vitest + Testing Library), and 29 E2E (Playwright)
 - Client-side E2E encryption — AES-256-GCM with PBKDF2-derived keys, per-field IV, IndexedDB cache for decrypted data across sessions. Zero-knowledge: the server never sees plaintext or the user's password
-- CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, native ARM builds with Docker layer caching, sequential deploy ordering (backend then frontend), zero-downtime ASG instance refresh with AWS-native auto-rollback, post-deploy smoke test, manual dispatch for operational recovery
-- Branch protection on main — required status checks (lint, backend tests, E2E), strict up-to-date, enforce admins
+- CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, frontend lint/test/build checks, native ARM builds with Docker layer caching, conditional deploy ordering (frontend-only independent, full-stack backend then frontend), zero-downtime ASG instance refresh with AWS-native auto-rollback, post-deploy smoke test, manual dispatch for operational recovery
+- Branch protection on main — required status checks (lint, backend tests, frontend tests, frontend build, E2E), strict up-to-date, enforce admins
 - Least-privilege IAM — ec2:RunInstances scoped to launch template via condition key, PassRole restricted to EC2 service
 - Load tested with k6 to validate horizontal scaling handles CPU-bound load which fails on single instance
 
@@ -94,7 +97,7 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 
 ## Project Structure
 
-```
+```text
 ├── frontend/
 │   └── src/
 │       ├── pages/          # LoginPage, HomePage, ExerciseFormPage, ExerciseDetail
@@ -111,16 +114,16 @@ CI/CD: GitHub Actions → test → build (ARM) → push ECR → ASG rolling depl
 │   ├── demoSeed.mjs         # Seed data generator for demo accounts
 │   ├── tests/               # Backend test suite (node:test + supertest + mongodb-memory-server)
 │   │   ├── setup.mjs        # In-memory MongoDB, test helpers
-│   │   ├── validation.test.mjs  # Input validation unit tests (30 tests)
-│   │   ├── auth.test.mjs        # Auth API integration tests (27 tests)
-│   │   └── exercises.test.mjs   # Exercise CRUD integration tests (34 tests)
+│   │   ├── validation.test.mjs  # Input validation unit tests
+│   │   ├── auth.test.mjs        # Auth and purpose API integration tests
+│   │   └── exercises.test.mjs   # Exercise CRUD integration tests
 │   ├── Dockerfile            # Multi-stage build (Node 24 Alpine, argon2 native deps)
 │   ├── compose.yaml          # Local container testing
 │   ├── k6-benchmark.js      # k6 load test script
 │   └── user-data.sh         # EC2 bootstrap: pull image from ECR, fetch secrets from SSM
 ├── .github/workflows/
 │   └── ci.yml              # Unified CI/CD: change detection, test, build, deploy
-├── e2e/
+└── e2e/
 │   ├── tests/               # Playwright E2E tests (29 tests)
 │   │   ├── auth.spec.mjs    # Auth flows, demo mode, session restore
 │   │   ├── exercises-crud.spec.mjs  # CRUD, duplicate, discard guard, delete cancel
@@ -149,11 +152,14 @@ You'll need:
 ### Testing
 
 ```bash
-cd backend && npm test              # 91 backend tests (~4s)
-cd e2e && npm test       # 29 E2E tests (~24s, needs servers running)
+cd backend && npm test              # 96 backend tests
+cd frontend && npm test             # 8 frontend tests
+cd e2e && npm test                  # 29 E2E tests (needs servers running)
 ```
 
-**Backend tests** use an in-memory MongoDB (mongodb-memory-server) — no external database needed. Covers input validation, auth flows, exercise CRUD, user isolation, and malformed ID handling.
+**Backend tests** use an in-memory MongoDB (mongodb-memory-server) — no external database needed. Covers input validation, auth flows, exercise CRUD, user isolation, malformed ID handling, and purpose updates.
+
+**Frontend tests** use Vitest + Testing Library. Covers dashboard logic and progressive log behavior, including PR utilities, adaptive counts, greetings, and reveal controls.
 
 **E2E tests** use Playwright against running dev servers. Covers auth, full CRUD, form validation, demo mode, discard guards, and session persistence.
 
@@ -170,9 +176,10 @@ Merging to `main` triggers automated deployment via GitHub Actions (`ci.yml`).
 ```
 push/PR → change detection → backend tests (if changed)
                             → frontend lint (if changed)
+                            → frontend tests/build (if changed)
                             → E2E tests (always)
                             → deploy backend (if changed, push only)
-                            → deploy frontend (after backend, if changed, push only)
+                            → deploy frontend (frontend-only independent, full-stack after backend)
 
 Manual dispatch: workflow_dispatch with backend/frontend/both selector
 ```
@@ -216,7 +223,7 @@ Decrypted exercises are cached in IndexedDB so the app works across page reloads
 This is a zero-knowledge architecture: even with full database access, exercise data is unreadable without the user's password.
 
 ### Demo Mode
-Clicking "Try the demo" creates a throwaway user with ~25 realistic seeded exercises spread across the last few weeks. Demo users get full CRUD access — the experience is identical to a real account. Both the user and their exercises have a `demoExpiresAt` field with a MongoDB TTL index, so they're automatically cleaned up after 24 hours with zero maintenance.
+Clicking "Try the demo" creates a throwaway user with realistic seeded training history, a visible purpose, current-day activity, and enough depth to power the dashboard and PR views. Demo users get full CRUD access — the experience is identical to a real account. Both the user and their exercises have a `demoExpiresAt` field with a MongoDB TTL index, so they're automatically cleaned up after 24 hours with zero maintenance.
 
 ### Accessibility
 Button elements for all actions, `aria-label` on icon buttons, preserved focus states for keyboard navigation.
