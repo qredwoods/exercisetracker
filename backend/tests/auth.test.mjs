@@ -319,6 +319,70 @@ describe("Auth API", () => {
     });
   });
 
+  describe("PATCH /api/auth/me/purpose", () => {
+    it("updates the authenticated user's purpose", async () => {
+      const { accessToken } = await createTestUser();
+
+      const res = await request
+        .patch("/api/auth/me/purpose")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ purpose: "Keep moving for the long haul" })
+        .expect(200);
+
+      assert.equal(res.body.purpose, "Keep moving for the long haul");
+
+      const me = await request
+        .get("/api/auth/me")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      assert.equal(me.body.user.purpose, "Keep moving for the long haul");
+    });
+
+    it("trims purpose before saving", async () => {
+      const { accessToken } = await createTestUser();
+
+      const res = await request
+        .patch("/api/auth/me/purpose")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ purpose: "  Stay ready for pickup basketball  " })
+        .expect(200);
+
+      assert.equal(res.body.purpose, "Stay ready for pickup basketball");
+    });
+
+    it("400 when purpose is not a string", async () => {
+      const { accessToken } = await createTestUser();
+
+      const res = await request
+        .patch("/api/auth/me/purpose")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ purpose: 123 })
+        .expect(400);
+
+      assert.match(res.body.error, /purpose must be a string/i);
+    });
+
+    it("400 when purpose exceeds 100 characters", async () => {
+      const { accessToken } = await createTestUser();
+
+      const res = await request
+        .patch("/api/auth/me/purpose")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ purpose: "x".repeat(101) })
+        .expect(400);
+
+      assert.match(res.body.error, /under 100 characters/i);
+    });
+
+    it("401 without token", async () => {
+      await request
+        .patch("/api/auth/me/purpose")
+        .send({ purpose: "Keep showing up" })
+        .expect(401);
+    });
+  });
+
   // ── demo ────────────────────────────────────────────────
   describe("POST /api/auth/demo", () => {
     it("creates demo account with seeded exercises", async () => {
@@ -326,6 +390,7 @@ describe("Auth API", () => {
 
       assert.ok(res.body.accessToken);
       assert.equal(res.body.user.isDemo, true);
+      assert.equal(res.body.user.purpose, "Keep up with my future grandkids");
 
       // demo user should have exercises
       const exercises = await request

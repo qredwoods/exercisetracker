@@ -1,3 +1,4 @@
+import React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import ExerciseRow from './ExerciseRow'
