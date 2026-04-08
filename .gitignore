@@ -21,6 +21,7 @@ pnpm-debug.log*
 # misc
 coverage/
 .capture/
+.jobs/
 
 # e2e test artifacts
 e2e/test-results/
