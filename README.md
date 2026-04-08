@@ -4,7 +4,9 @@
 
 Full-stack exercise tracker for logging workouts and getting something meaningful back from the habit. A dashboard reflects activity with adaptive exercise counts, editable purpose, and latest PR surfacing, while exercise names and notes are encrypted on your device before they leave the browser. One-click demo mode lets anyone try it instantly.
 
-React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. E2E encryption (AES-256-GCM, PBKDF2-derived keys, IndexedDB cache), SSM Parameter Store for secrets, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, 133 automated tests, and CI/CD via GitHub Actions.
+Fitness apps often surface data that can trigger sensitive conditions and pressure users with streaks and shame-based metrics. SparkMvmt takes the opposite approach: the dashboard adapts to encourage momentum, greetings welcome you back without guilt, and E2E encryption means even the server can't judge what you logged.
+
+React + Vite SPA on S3 + CloudFront, Dockerized Express API on EC2 Auto Scaling Group behind an ALB with ACM TLS termination. E2E encryption (AES-256-GCM, PBKDF2-derived keys, IndexedDB cache), SSM Parameter Store for secrets, IAM role-based ECR auth, JWT token rotation with Argon2, object-level authorization, 140 automated tests, and CI/CD via GitHub Actions.
 
 ## Architecture
 
@@ -86,7 +88,7 @@ Manual dispatch is available for operational recovery.
 - DB-aware health check (`/health` verifies MongoDB connection) — ALB auto-replaces unhealthy instances
 - Graceful shutdown on SIGTERM for zero-downtime container deploys
 - ECR image pipeline with IAM instance role authentication
-- 133 automated tests: 96 backend (node:test + supertest + mongodb-memory-server), 8 frontend (Vitest + Testing Library), and 29 E2E (Playwright)
+- 140 automated tests: 92 backend (node:test + supertest + mongodb-memory-server), 8 frontend (Vitest + Testing Library), and 40 E2E (Playwright)
 - Client-side E2E encryption — AES-256-GCM with PBKDF2-derived keys, per-field IV, IndexedDB cache for decrypted data across sessions. Zero-knowledge: the server never sees plaintext or the user's password
 - CI/CD via GitHub Actions — OIDC auth (no stored AWS keys), change detection gates deploys, frontend lint/test/build checks, native ARM builds with Docker layer caching, conditional deploy ordering (frontend-only independent, full-stack backend then frontend), zero-downtime ASG instance refresh with AWS-native auto-rollback, post-deploy smoke test, manual dispatch for operational recovery
 - Branch protection on main — required status checks (lint, backend tests, frontend tests, frontend build, E2E), strict up-to-date, enforce admins
@@ -124,7 +126,7 @@ Manual dispatch is available for operational recovery.
 ├── .github/workflows/
 │   └── ci.yml              # Unified CI/CD: change detection, test, build, deploy
 └── e2e/
-│   ├── tests/               # Playwright E2E tests (29 tests)
+│   ├── tests/               # Playwright E2E tests (40 tests)
 │   │   ├── auth.spec.mjs    # Auth flows, demo mode, session restore
 │   │   ├── exercises-crud.spec.mjs  # CRUD, duplicate, discard guard, delete cancel
 │   │   ├── form-validation.spec.mjs # Form + signup validation
@@ -152,16 +154,16 @@ You'll need:
 ### Testing
 
 ```bash
-cd backend && npm test              # 96 backend tests
+cd backend && npm test              # 92 backend tests
 cd frontend && npm test             # 8 frontend tests
-cd e2e && npm test                  # 29 E2E tests (needs servers running)
+cd e2e && npm test                  # 40 E2E tests (needs servers running)
 ```
 
 **Backend tests** use an in-memory MongoDB (mongodb-memory-server) — no external database needed. Covers input validation, auth flows, exercise CRUD, user isolation, malformed ID handling, and purpose updates.
 
 **Frontend tests** use Vitest + Testing Library. Covers dashboard logic and progressive log behavior, including PR utilities, adaptive counts, greetings, and reveal controls.
 
-**E2E tests** use Playwright against running dev servers. Covers auth, full CRUD, form validation, demo mode, discard guards, and session persistence.
+**E2E tests** use Playwright against running dev servers. Covers auth, full CRUD, form validation, signup validation, demo mode, discard guards, and session persistence.
 
 ### API Testing (manual)
 
